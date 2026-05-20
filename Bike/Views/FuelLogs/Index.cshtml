@@ -1,0 +1,118 @@
+﻿@model List<Bike.Models.FuelLog>
+
+@{
+    var lang = Context.Session.GetString("lang") ?? "en";
+
+    string title =
+        lang == "ja" ? "給油履歴" :
+        lang == "vi" ? "Lịch sử đổ xăng" :
+        "Fuel Log History";
+
+    string addButton =
+        lang == "ja" ? "＋ 給油追加" :
+        lang == "vi" ? "+ Thêm bản ghi" :
+        "+ Add Fuel Log";
+
+    string dashboardButton =
+        lang == "ja" ? "ダッシュボード" :
+        lang == "vi" ? "Bảng điều khiển" :
+        "Dashboard";
+
+    string dateText =
+        lang == "ja" ? "日付" :
+        lang == "vi" ? "Ngày" :
+        "Date";
+
+    string distanceText =
+        lang == "ja" ? "走行距離" :
+        lang == "vi" ? "Khoảng cách" :
+        "Distance";
+
+    string fuelText =
+        lang == "ja" ? "給油量" :
+        lang == "vi" ? "Nhiên liệu" :
+        "Fuel";
+
+    string efficiencyText =
+        lang == "ja" ? "燃費" :
+        lang == "vi" ? "Hiệu suất nhiên liệu" :
+        "Efficiency";
+}
+
+<div style="margin-bottom:20px;">
+    <a href="/Language/Set?lang=en">English</a> |
+    <a href="/Language/Set?lang=ja">日本語</a> |
+    <a href="/Language/Set?lang=vi">Tiếng Việt</a>
+</div>
+
+<h1 style="text-align:center;">
+    🏍 @title
+</h1>
+
+<div style="margin-bottom:20px;">
+
+    <a href="/FuelLogs/Create"
+       style="
+        background-color:#28a745;
+        color:white;
+        padding:10px 15px;
+        text-decoration:none;
+        border-radius:8px;">
+        @addButton
+    </a>
+
+    <a href="/FuelLogs/Dashboard"
+       style="
+        background-color:#007bff;
+        color:white;
+        padding:10px 15px;
+        text-decoration:none;
+        border-radius:8px;
+        margin-left:10px;">
+        @dashboardButton
+    </a>
+
+</div>
+
+<table style="
+    width:100%;
+    border-collapse:collapse;
+    background-color:white;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    ">
+
+    <thead style="background-color:#343a40; color:white;">
+        <tr>
+            <th style="padding:12px;">@dateText</th>
+            <th style="padding:12px;">@distanceText</th>
+            <th style="padding:12px;">@fuelText</th>
+            <th style="padding:12px;">@efficiencyText</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr style="border-bottom:1px solid #ddd;">
+
+                <td style="padding:12px;">
+                    @item.FuelDate.ToString("yyyy/MM/dd")
+                </td>
+
+                <td style="padding:12px;">
+                    @item.DistanceKm km
+                </td>
+
+                <td style="padding:12px;">
+                    @item.FuelLiter L
+                </td>
+
+                <td style="padding:12px; color:green; font-weight:bold;">
+                    @item.FuelEfficiency.ToString("0.0") km/L
+                </td>
+
+            </tr>
+        }
+    </tbody>
+
+</table>

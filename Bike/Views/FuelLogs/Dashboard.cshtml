@@ -1,0 +1,46 @@
+﻿@model List<Bike.Models.FuelLog>
+
+<h1>Dashboard</h1>
+
+<div>
+    <h3>Average Fuel Efficiency</h3>
+    <p>@ViewBag.AverageFuelEfficiency.ToString("0.0") km/L</p>
+</div>
+
+<div>
+    <h3>Monthly Fuel Cost</h3>
+    <p>@ViewBag.MonthlyFuelCost</p>
+</div>
+
+<hr />
+
+<p>
+    <a href="/FuelLogs/Create">+ Add Fuel Log</a>
+</p>
+
+<p>
+    <a href="/FuelLogs">Fuel Log History</a>
+</p>
+
+<table border="1" cellpadding="10">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Distance</th>
+            <th>Fuel</th>
+            <th>Efficiency</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FuelDate.ToString("yyyy/MM/dd")</td>
+                <td>@item.DistanceKm km</td>
+                <td>@item.FuelLiter L</td>
+                <td>@item.FuelEfficiency.ToString("0.0") km/L</td>
+            </tr>
+        }
+    </tbody>
+</table>

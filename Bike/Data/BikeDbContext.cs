@@ -1,0 +1,15 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Bike.Models;
+
+namespace Bike.Data
+{
+    public class BikeDbContext : DbContext
+    {
+        public BikeDbContext(DbContextOptions<BikeDbContext> options)
+            : base(options)
+        {
+        }
+
+        public DbSet<FuelLog> FuelLogs { get; set; }
+    }
+}
