@@ -1,8 +1,172 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<Bike.Models.FuelLog>
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    double averageFuelEfficiency =
+        Model.Any() ? Model.Average(x => x.FuelEfficiency) : 0;
+
+    
+    decimal monthlyFuelCost =
+        Model.Sum(x => (decimal)(x.Cost ?? 0));
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+
+    <!-- Title -->
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-primary bg-opacity-10 rounded-4 p-3 me-3">
+            <span style="font-size:32px;">🏍</span>
+        </div>
+
+        <h1 class="fw-bold display-5 mb-0">
+            Dashboard
+        </h1>
+    </div>
+
+    <!-- Cards -->
+    <div class="row g-4 mb-4">
+
+        <!-- Average Fuel Efficiency -->
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-4 me-4">
+                            <span style="font-size:40px;">⛽</span>
+                        </div>
+
+                        <div>
+                            <h4 class="text-muted mb-2">
+                                Average Fuel Efficiency
+                            </h4>
+
+                            <h1 class="fw-bold text-primary">
+                                @averageFuelEfficiency.ToString("0.0")
+                            </h1>
+
+                            <h4 class="text-muted">
+                                km/L
+                            </h4>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Monthly Fuel Cost -->
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="bg-success bg-opacity-10 rounded-circle p-4 me-4">
+                            <span style="font-size:40px;">💰</span>
+                        </div>
+
+                        <div>
+                            <h4 class="text-muted mb-2">
+                                Monthly Fuel Cost
+                            </h4>
+
+                            <h1 class="fw-bold text-success">
+                                ¥@monthlyFuelCost
+                            </h1>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex gap-3 mb-5">
+
+        <a href="/FuelLogs/Create"
+           class="btn btn-primary btn-lg px-4 py-3 rounded-4 shadow-sm">
+
+            ＋ Add Fuel Log
+
+        </a>
+
+        <a href="/FuelLogs"
+           class="btn btn-outline-primary btn-lg px-4 py-3 rounded-4">
+
+            📋 Fuel Log History
+
+        </a>
+
+    </div>
+
+    <!-- Recent Logs -->
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body p-4">
+
+            <h2 class="fw-bold mb-4">
+                📄 Recent Fuel Logs
+            </h2>
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>📅 Date</th>
+                            <th>📍 Distance</th>
+                            <th>⛽ Fuel</th>
+                            <th>📈 Efficiency</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.FuelDate.ToString("yyyy/MM/dd")
+                                </td>
+
+                                <td>
+                                    @item.DistanceKm km
+                                </td>
+
+                                <td>
+                                    @item.FuelLiter L
+                                </td>
+
+                                <td class="fw-bold text-success">
+                                    @item.FuelEfficiency.ToString("0.0") km/L
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
