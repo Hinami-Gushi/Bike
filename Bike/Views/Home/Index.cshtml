@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Dashboard";
-
     double averageFuelEfficiency =
         Model.Any() ? Model.Average(x => x.FuelEfficiency) : 0;
 

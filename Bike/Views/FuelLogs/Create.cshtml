@@ -1,4 +1,4 @@
-﻿@model Bike.Models.FuelLog
+@model Bike.Models.FuelLog
 
 @{
     Layout = "_AppLayout";
@@ -67,27 +67,27 @@
         <div class="bfl-card bfl-form-card">
             <div class="bfl-form-title">🧾 Add Fuel Log</div>
 
-            <form method="post" class="bfl-form">
+            <form asp-action="Create" method="post" class="bfl-form">
                 <div class="bfl-field">
-                    <label class="bfl-label">Date <span class="bfl-required">*</span></label>
-                    <input class="bfl-input" type="date" name="FuelDate" value="@fuelDate" required />
+                    <label class="bfl-label" asp-for="FuelDate">Date <span class="bfl-required">*</span></label>
+                    <input class="bfl-input" type="date" asp-for="FuelDate" value="@fuelDate" required />
                 </div>
 
                 <div class="bfl-row">
                     <div class="bfl-field">
-                        <label class="bfl-label">Fuel (L) <span class="bfl-required">*</span></label>
-                        <input class="bfl-input" type="number" step="0.1" min="0" name="FuelLiter" placeholder="e.g. 3.5" required />
+                        <label class="bfl-label" asp-for="FuelLiter">Fuel (L) <span class="bfl-required">*</span></label>
+                        <input class="bfl-input" type="number" step="0.1" min="0" asp-for="FuelLiter" placeholder="e.g. 3.5" required />
                     </div>
 
                     <div class="bfl-field">
-                        <label class="bfl-label">Distance (km) <span class="bfl-required">*</span></label>
-                        <input class="bfl-input" type="number" step="0.1" min="0" name="DistanceKm" placeholder="e.g. 120" required />
+                        <label class="bfl-label" asp-for="DistanceKm">Distance (km) <span class="bfl-required">*</span></label>
+                        <input class="bfl-input" type="number" step="0.1" min="0" asp-for="DistanceKm" placeholder="e.g. 120" required />
                     </div>
                 </div>
 
                 <div class="bfl-field">
-                    <label class="bfl-label">Cost (optional)</label>
-                    <input class="bfl-input" type="number" step="0.1" min="0" name="Cost" placeholder="50000" />
+                    <label class="bfl-label" asp-for="Cost">Cost (optional)</label>
+                    <input class="bfl-input" type="number" step="0.1" min="0" asp-for="Cost" placeholder="50000" />
                 </div>
 
                 <button class="bfl-submit" type="submit">Save</button>

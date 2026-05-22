@@ -361,6 +361,93 @@ body {
   margin-left: 2px;
 }
 
+/* --- Monthly Cost --- */
+.bfl-monthly-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    margin-bottom: 14px;
+}
+
+.bfl-monthly-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #111827;
+}
+
+.bfl-monthly-badge {
+    background: #e7f5ef;
+    color: #14532d;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.bfl-monthly-card {
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 18px;
+    padding: 24px 20px 10px;
+    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+    position: relative;
+    overflow: hidden;
+}
+
+.bfl-monthly-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.bfl-monthly-date {
+    font-size: 22px;
+    font-weight: 900;
+    color: #111827;
+}
+
+.bfl-monthly-total {
+    background: #fdf2e9;
+    color: #9a3412;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.bfl-monthly-metrics {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.bfl-monthly-metric-item {
+    flex: 1;
+}
+
+.bfl-monthly-metric-value {
+    font-size: 20px;
+    font-weight: 900;
+    color: #149465;
+    margin-bottom: 4px;
+}
+
+.bfl-monthly-metric-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.bfl-monthly-progress {
+    height: 6px;
+    background: #b45309;
+    border-radius: 999px;
+    margin: 0 4px;
+}
+
 .bfl-text-green { color: #149465; }
 .bfl-text-blue  { color: #3b82f6; }
 .bfl-text-orange{ color: #b45309; }
