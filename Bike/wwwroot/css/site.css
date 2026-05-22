@@ -21,6 +21,364 @@ body {
   margin-bottom: 60px;
 }
 
+/* --- Dashboard（画像風UI）--- */
+.bfl-body {
+  margin: 0;
+    margin-bottom: 0;
+}
+
+.bfl-page {
+  background: #f6f7f9;
+  min-height: 100vh;
+}
+
+.bfl-topbar {
+  background: linear-gradient(180deg, #22a077 0%, #1f9d73 55%, #1c8f6a 100%);
+  color: #ffffff;
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.bfl-brand-title {
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.bfl-brand-sub {
+  opacity: 0.9;
+  font-weight: 600;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.bfl-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bfl-pill {
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  line-height: 1;
+}
+
+.bfl-pill-currency {
+  background: #1f9d73;
+  color: #111827;
+  border: 1px solid rgba(0,0,0,0.35);
+}
+
+.bfl-pill-lang {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid rgba(0,0,0,0.18);
+}
+
+.bfl-nav {
+  padding: 10px 10px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.bfl-nav-item {
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #c7c7c7;
+  border-radius: 14px;
+  padding: 12px 8px;
+  text-align: center;
+  color: #111827;
+}
+
+.bfl-nav-item.is-active {
+  border: 2px solid #111827;
+  background: #f3f1e8;
+}
+
+.bfl-nav-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+.bfl-nav-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.bfl-nav-text {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.bfl-content {
+  padding: 12px;
+}
+
+.bfl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.bfl-card {
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.bfl-card-wide {
+  margin-top: 12px;
+}
+
+.bfl-card-title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: #111827;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+
+.bfl-card-value {
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+/* --- Add Fuel Log form --- */
+.bfl-form-card {
+    padding: 18px;
+    border-radius: 18px;
+}
+
+.bfl-form-title {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 14px;
+}
+
+.bfl-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bfl-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.bfl-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bfl-label {
+    font-weight: 800;
+    font-size: 14px;
+    color: #111827;
+}
+
+.bfl-required {
+    color: #dc2626;
+}
+
+.bfl-input {
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 12px 12px;
+    font-size: 18px;
+    outline: none;
+}
+
+.bfl-input:focus {
+    border-color: #1f9d73;
+    box-shadow: 0 0 0 3px rgba(31, 157, 115, 0.15);
+}
+
+.bfl-submit {
+    margin-top: 6px;
+    width: 100%;
+    border-radius: 14px;
+    padding: 14px 12px;
+    font-weight: 900;
+    font-size: 18px;
+    background: #ffffff;
+    border: 1px solid #cfcfcf;
+    color: #111827;
+}
+
+.bfl-submit:hover {
+    border-color: rgba(0,0,0,0.28);
+}
+
+/* --- History list --- */
+.bfl-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.bfl-history-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #111827;
+}
+
+.bfl-history-badge {
+    background: #e7f5ef;
+    color: #14532d;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.bfl-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bfl-history-card {
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 18px;
+    padding: 14px;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+}
+
+.bfl-history-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.bfl-history-date {
+    font-weight: 800;
+    color: #374151;
+}
+
+.bfl-history-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.bfl-inline {
+    display: inline;
+}
+
+.bfl-icon-btn {
+    width: 52px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+    text-decoration: none;
+}
+
+.bfl-icon-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.bfl-history-mid {
+    margin-top: 12px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    color: #111827;
+    font-weight: 900;
+}
+
+.bfl-history-metric {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+}
+
+.bfl-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #149465;
+    display: inline-block;
+}
+
+.bfl-history-bottom {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.bfl-history-cost {
+    font-weight: 800;
+    color: #6b7280;
+}
+
+.bfl-history-eff {
+    background: #e7f5ef;
+    color: #14532d;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 22px;
+}
+
+.bfl-unit {
+  font-size: 14px;
+  font-weight: 800;
+  margin-left: 2px;
+}
+
+.bfl-text-green { color: #149465; }
+.bfl-text-blue  { color: #3b82f6; }
+.bfl-text-orange{ color: #b45309; }
+
+.bfl-primary-action {
+  margin-top: 14px;
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #cfcfcf;
+  border-radius: 14px;
+  padding: 14px 12px;
+  font-weight: 900;
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;

@@ -1,29 +1,97 @@
 ﻿@model Bike.Models.FuelLog
 
-<h1>Add Fuel Log</h1>
+@{
+    Layout = "_AppLayout";
+    ViewData["Title"] = "Add";
 
-<form method="post">
+    var lang = Context.Session.GetString("lang") ?? "en";
+    string currencyLabel = "VND";
+    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
+    var fuelDate = (Model?.FuelDate ?? DateTime.Today).ToString("yyyy-MM-dd");
+}
 
-    <p>
-        Date
-        <input type="date" name="FuelDate" />
-    </p>
+<div class="bfl-page">
+    <div class="bfl-topbar">
+        <div class="bfl-brand">
+            <div class="bfl-brand-title">🏍 Bike Fuel Log</div>
+            <div class="bfl-brand-sub">QTSC Field Tracker</div>
+        </div>
 
-    <p>
-        Fuel Amount
-        <input type="number" step="0.1" name="FuelLiter" />
-    </p>
+        <div class="bfl-topbar-actions">
+            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
 
-    <p>
-        Distance
-        <input type="number" step="0.1" name="DistanceKm" />
-    </p>
+            <div class="dropdown">
+                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    @langLabel
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
+                    <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
+                    <li><a class="dropdown-item" href="/Language/Set?lang=vi">Tiếng Việt</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-    <p>
-        Cost
-        <input type="number" step="0.1" name="Cost" />
-    </p>
+    <div class="bfl-nav">
+        <a class="bfl-nav-item" href="/FuelLogs/Dashboard">
+            <span class="bfl-nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3l9-8z" /></svg>
+            </span>
+            <span class="bfl-nav-text">Dashboard</span>
+        </a>
 
-    <button type="submit">Save</button>
+        <a class="bfl-nav-item is-active" href="/FuelLogs/Create">
+            <span class="bfl-nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6v-2z" /></svg>
+            </span>
+            <span class="bfl-nav-text">Add</span>
+        </a>
 
-</form>
+        <a class="bfl-nav-item" href="/FuelLogs">
+            <span class="bfl-nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2zM3 6h2v2H3V6zm0 5h2v2H3v-2zm0 5h2v2H3v-2z" /></svg>
+            </span>
+            <span class="bfl-nav-text">History</span>
+        </a>
+
+        <a class="bfl-nav-item" href="/FuelLogs/Monthly">
+            <span class="bfl-nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm13 8H6v10h14V10z" /></svg>
+            </span>
+            <span class="bfl-nav-text">Monthly</span>
+        </a>
+    </div>
+
+    <div class="bfl-content">
+        <div class="bfl-card bfl-form-card">
+            <div class="bfl-form-title">🧾 Add Fuel Log</div>
+
+            <form method="post" class="bfl-form">
+                <div class="bfl-field">
+                    <label class="bfl-label">Date <span class="bfl-required">*</span></label>
+                    <input class="bfl-input" type="date" name="FuelDate" value="@fuelDate" required />
+                </div>
+
+                <div class="bfl-row">
+                    <div class="bfl-field">
+                        <label class="bfl-label">Fuel (L) <span class="bfl-required">*</span></label>
+                        <input class="bfl-input" type="number" step="0.1" min="0" name="FuelLiter" placeholder="e.g. 3.5" required />
+                    </div>
+
+                    <div class="bfl-field">
+                        <label class="bfl-label">Distance (km) <span class="bfl-required">*</span></label>
+                        <input class="bfl-input" type="number" step="0.1" min="0" name="DistanceKm" placeholder="e.g. 120" required />
+                    </div>
+                </div>
+
+                <div class="bfl-field">
+                    <label class="bfl-label">Cost (optional)</label>
+                    <input class="bfl-input" type="number" step="0.1" min="0" name="Cost" placeholder="50000" />
+                </div>
+
+                <button class="bfl-submit" type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
