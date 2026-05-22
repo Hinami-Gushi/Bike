@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Bike.Data;
 using Bike.Models;
+using System;
+using System.Linq;
 
 namespace Bike.Controllers
 {
@@ -16,44 +18,114 @@ namespace Bike.Controllers
         // 一覧
         public IActionResult Index()
         {
-            var logs = _context.FuelLogs.ToList();
+            var logs = _context.FuelLogs
+                .OrderByDescending(x => x.FuelDate)
+                .ToList();
             return View(logs);
         }
 
         // Dashboard
         public IActionResult Dashboard()
         {
-            var logs = _context.FuelLogs.ToList();
+            var logs = _context.FuelLogs
+                .OrderByDescending(x => x.FuelDate)
+                .ToList();
 
             double averageFuelEfficiency = logs.Any()
                 ? logs.Average(x => x.FuelEfficiency)
                 : 0;
 
             double monthlyFuelCost = logs
-                .Where(x => x.FuelDate.Month == DateTime.Now.Month)
+                .Where(x => x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
                 .Sum(x => x.Cost ?? 0);
+
+            double totalFuel = logs.Sum(x => x.FuelLiter);
+            double totalDistance = logs.Sum(x => x.DistanceKm);
+            double latestEfficiency = logs.FirstOrDefault()?.FuelEfficiency ?? 0;
 
             ViewBag.AverageFuelEfficiency = averageFuelEfficiency;
             ViewBag.MonthlyFuelCost = monthlyFuelCost;
+            ViewBag.TotalFuel = totalFuel;
+            ViewBag.TotalDistance = totalDistance;
+            ViewBag.LatestEfficiency = latestEfficiency;
 
             return View(logs);
+        }
+
+        // Monthly（画面枠）
+        public IActionResult Monthly()
+        {
+            return View();
         }
 
         // 追加画面
         public IActionResult Create()
         {
-            return View();
+            return View(new FuelLog
+            {
+                FuelDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc)
+            });
         }
 
         // 保存
         [HttpPost]
         public IActionResult Create(FuelLog log)
         {
-            log.CreatedAt = DateTime.Now;
+            log.CreatedAt = DateTime.UtcNow;
+            log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
+            log.Currency ??= "VND";
 
             _context.FuelLogs.Add(log);
             _context.SaveChanges();
 
+
+            return RedirectToAction("Dashboard");
+        }
+
+        // 編集画面
+        public IActionResult Edit(int id)
+        {
+            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id);
+            if (log is null)
+            {
+                return NotFound();
+            }
+
+            return View(log);
+        }
+
+        // 更新
+        [HttpPost]
+        public IActionResult Edit(FuelLog log)
+        {
+            var existing = _context.FuelLogs.FirstOrDefault(x => x.Id == log.Id);
+            if (existing is null)
+            {
+                return NotFound();
+            }
+
+            existing.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
+            existing.FuelLiter = log.FuelLiter;
+            existing.DistanceKm = log.DistanceKm;
+            existing.Cost = log.Cost;
+            existing.Currency = string.IsNullOrWhiteSpace(log.Currency) ? existing.Currency ?? "VND" : log.Currency;
+
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        // 削除
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id);
+            if (log is null)
+            {
+                return NotFound();
+            }
+
+            _context.FuelLogs.Remove(log);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
     }
