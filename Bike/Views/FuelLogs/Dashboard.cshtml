@@ -12,8 +12,29 @@
     var totalDistance = (double)(ViewBag.TotalDistance ?? 0d);
     var latest = (double)(ViewBag.LatestEfficiency ?? 0d);
 
-    string currencyLabel = "VND";
+    string currencyLabel = Context.Session.GetString("currency") ?? "USD";
     string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
+
+    // Translations
+    var t = new Dictionary<string, Dictionary<string, string>>
+    {
+        ["en"] = new() {
+            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
+            ["AvgEfficiency"] = "AVG EFFICIENCY", ["TotalFuel"] = "TOTAL FUEL", ["MonthCost"] = "THIS MONTH COST", 
+            ["TotalDistance"] = "TOTAL DISTANCE", ["LatestEfficiency"] = "LATEST EFFICIENCY", ["AddFuelLog"] = "＋ Add Fuel Log"
+        },
+        ["ja"] = new() {
+            ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
+            ["AvgEfficiency"] = "平均燃費", ["TotalFuel"] = "総給油量", ["MonthCost"] = "今月の燃料費", 
+            ["TotalDistance"] = "総走行距離", ["LatestEfficiency"] = "直近の燃費", ["AddFuelLog"] = "＋ 給油記録を追加"
+        },
+        ["vi"] = new() {
+            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
+            ["AvgEfficiency"] = "HIỆU SUẤT TRUNG BÌNH", ["TotalFuel"] = "TỔNG NHIÊN LIỆU", ["MonthCost"] = "CHI PHÍ THÁNG NÀY", 
+            ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG", ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT", ["AddFuelLog"] = "＋ Thêm Nhật ký Nhiên liệu"
+        }
+    };
+    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 }
 
 <div class="bfl-page">
@@ -44,59 +65,59 @@
             <span class="bfl-nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3l9-8z"/></svg>
             </span>
-            <span class="bfl-nav-text">Dashboard</span>
+            <span class="bfl-nav-text">@currentT["Dashboard"]</span>
         </a>
 
         <a class="bfl-nav-item" href="/FuelLogs/Create">
             <span class="bfl-nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6v-2z"/></svg>
             </span>
-            <span class="bfl-nav-text">Add</span>
+            <span class="bfl-nav-text">@currentT["Add"]</span>
         </a>
 
         <a class="bfl-nav-item" href="/FuelLogs/Index">
             <span class="bfl-nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2zM3 6h2v2H3V6zm0 5h2v2H3v-2zm0 5h2v2H3v-2z"/></svg>
             </span>
-            <span class="bfl-nav-text">History</span>
+            <span class="bfl-nav-text">@currentT["History"]</span>
         </a>
 
         <a class="bfl-nav-item" href="/FuelLogs/Monthly">
             <span class="bfl-nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm13 8H6v10h14V10z"/></svg>
             </span>
-            <span class="bfl-nav-text">Monthly</span>
+            <span class="bfl-nav-text">@currentT["Monthly"]</span>
         </a>
     </div>
 
     <div class="bfl-content">
         <div class="bfl-grid">
             <div class="bfl-card">
-                <div class="bfl-card-title">⚡ AVG EFFICIENCY</div>
+                <div class="bfl-card-title">⚡ @currentT["AvgEfficiency"]</div>
                 <div class="bfl-card-value bfl-text-green">@avg.ToString("0.0")<span class="bfl-unit">km/L</span></div>
             </div>
 
             <div class="bfl-card">
-                <div class="bfl-card-title">💧 TOTAL FUEL</div>
+                <div class="bfl-card-title">💧 @currentT["TotalFuel"]</div>
                 <div class="bfl-card-value bfl-text-blue">@totalFuel.ToString("0.0")<span class="bfl-unit">L</span></div>
             </div>
 
             <div class="bfl-card">
-                <div class="bfl-card-title">💲 THIS MONTH COST</div>
+                <div class="bfl-card-title">💲 @currentT["MonthCost"]</div>
                 <div class="bfl-card-value bfl-text-orange">@monthCost.ToString("#,0")<span class="bfl-unit">@currencyLabel</span></div>
             </div>
 
             <div class="bfl-card">
-                <div class="bfl-card-title">/\\ TOTAL DISTANCE</div>
+                <div class="bfl-card-title">/\\ @currentT["TotalDistance"]</div>
                 <div class="bfl-card-value bfl-text-green">@totalDistance.ToString("#,0")<span class="bfl-unit">km</span></div>
             </div>
         </div>
 
         <div class="bfl-card bfl-card-wide">
-            <div class="bfl-card-title">🔥 LATEST EFFICIENCY</div>
+            <div class="bfl-card-title">🔥 @currentT["LatestEfficiency"]</div>
             <div class="bfl-card-value bfl-text-green">@latest.ToString("0.00")<span class="bfl-unit">km/L</span></div>
         </div>
 
-        <a class="bfl-primary-action" href="/FuelLogs/Create">＋ Add Fuel Log</a>
+        <a class="bfl-primary-action" href="/FuelLogs/Create">@currentT["AddFuelLog"]</a>
     </div>
 </div>

@@ -100,7 +100,9 @@ namespace Bike.Controllers
             // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;
-            log.Currency ??= "VND";
+            
+            string sessionCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            log.Currency ??= sessionCurrency;
 
             _context.FuelLogs.Add(log);
             _context.SaveChanges();
@@ -135,7 +137,8 @@ namespace Bike.Controllers
             existing.FuelLiter = log.FuelLiter;
             existing.DistanceKm = log.DistanceKm;
             existing.Cost = log.Cost;
-            existing.Currency = string.IsNullOrWhiteSpace(log.Currency) ? existing.Currency ?? "VND" : log.Currency;
+            string sessionCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            existing.Currency = string.IsNullOrWhiteSpace(log.Currency) ? existing.Currency ?? sessionCurrency : log.Currency;
 
             _context.SaveChanges();
             return RedirectToAction("Index");
