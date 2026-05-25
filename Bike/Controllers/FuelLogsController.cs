@@ -18,7 +18,11 @@ namespace Bike.Controllers
         // 一覧
         public IActionResult Index()
         {
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
             var logs = _context.FuelLogs
+                .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
             return View(logs);
@@ -27,7 +31,11 @@ namespace Bike.Controllers
         // Dashboard
         public IActionResult Dashboard()
         {
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
             var logs = _context.FuelLogs
+                .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
 
@@ -55,8 +63,11 @@ namespace Bike.Controllers
         // Monthly（画面枠）
         public IActionResult Monthly()
         {
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
             var logs = _context.FuelLogs
-                .Where(x => x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
+                .Where(x => x.UserId == userId && x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
                 .ToList();
 
             double totalFuel = logs.Sum(x => x.FuelLiter);
@@ -76,6 +87,9 @@ namespace Bike.Controllers
         // 追加画面
         public IActionResult Create()
         {
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
             return View(new FuelLog
             {
                 FuelDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc)
@@ -86,16 +100,15 @@ namespace Bike.Controllers
         [HttpPost]
         public IActionResult Create(FuelLog log)
         {
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
             if (log == null)
             {
                 return BadRequest("Invalid data submitted.");
             }
 
-            // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
-            if (log.UserId == 0)
-            {
-                log.UserId = 1;
-            }
+            log.UserId = userId.Value;
 
             // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
@@ -107,14 +120,16 @@ namespace Bike.Controllers
             _context.FuelLogs.Add(log);
             _context.SaveChanges();
 
-
             return RedirectToAction("Dashboard");
         }
 
         // 編集画面
         public IActionResult Edit(int id)
         {
-            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id);
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id && x.UserId == userId);
             if (log is null)
             {
                 return NotFound();
@@ -127,7 +142,10 @@ namespace Bike.Controllers
         [HttpPost]
         public IActionResult Edit(FuelLog log)
         {
-            var existing = _context.FuelLogs.FirstOrDefault(x => x.Id == log.Id);
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var existing = _context.FuelLogs.FirstOrDefault(x => x.Id == log.Id && x.UserId == userId);
             if (existing is null)
             {
                 return NotFound();
@@ -148,7 +166,10 @@ namespace Bike.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id);
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id && x.UserId == userId);
             if (log is null)
             {
                 return NotFound();

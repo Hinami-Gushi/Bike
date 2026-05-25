@@ -1,0 +1,70 @@
+@{
+    Layout = "_AppLayout";
+    ViewData["Title"] = "Register";
+    var lang = Context.Session.GetString("lang") ?? "en";
+
+    var t = new Dictionary<string, Dictionary<string, string>>
+    {
+        ["en"] = new() { ["Register"] = "Register", ["Email"] = "Email", ["Password"] = "Password", ["HaveAccount"] = "Already have an account?", ["Login"] = "Login here", ["ErrEmailRegistered"] = "Email already registered." },
+        ["ja"] = new() { ["Register"] = "ユーザー登録", ["Email"] = "メールアドレス", ["Password"] = "パスワード", ["HaveAccount"] = "すでにアカウントをお持ちの方", ["Login"] = "ログインはこちら", ["ErrEmailRegistered"] = "このメールアドレスは既に登録されています。" },
+        ["vi"] = new() { ["Register"] = "Đăng ký", ["Email"] = "Email", ["Password"] = "Mật khẩu", ["HaveAccount"] = "Đã có tài khoản?", ["Login"] = "Đăng nhập tại đây", ["ErrEmailRegistered"] = "Email này đã được đăng ký." }
+    };
+    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
+    string currencyLabel = Context.Session.GetString("currency") ?? "USD";
+    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
+
+    string errorMsg = "";
+    if (ViewBag.ErrorKey != null && currentT.ContainsKey(ViewBag.ErrorKey)) {
+        errorMsg = currentT[ViewBag.ErrorKey];
+    }
+}
+
+<div class="bfl-page bfl-auth-page">
+    <div class="bfl-topbar">
+        <div class="bfl-brand">
+            <div class="bfl-brand-title">🏍 Bike Fuel Log</div>
+            <div class="bfl-brand-sub">Welcome</div>
+        </div>
+
+        <div class="bfl-topbar-actions">
+            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
+
+            <div class="dropdown">
+                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    @langLabel
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
+                    <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
+                    <li><a class="dropdown-item" href="/Language/Set?lang=vi">Tiếng Việt</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="bfl-content">
+        <div class="bfl-card bfl-form-card">
+            <div class="bfl-form-title">📝 @currentT["Register"]</div>
+            
+            @if (!string.IsNullOrEmpty(errorMsg)) {
+                <div class="alert alert-danger">@errorMsg</div>
+            }
+
+            <form asp-action="Register" method="post" class="bfl-form">
+                <div class="bfl-field">
+                    <label class="bfl-label">@currentT["Email"]</label>
+                    <input class="bfl-input" type="email" name="email" required />
+                </div>
+                <div class="bfl-field">
+                    <label class="bfl-label">@currentT["Password"]</label>
+                    <input class="bfl-input" type="password" name="password" required />
+                </div>
+                <button class="bfl-submit" type="submit">@currentT["Register"]</button>
+            </form>
+
+            <div class="mt-3 text-center">
+                <small class="text-muted">@currentT["HaveAccount"] <a href="/Account/Login">@currentT["Login"]</a></small>
+            </div>
+        </div>
+    </div>
+</div>

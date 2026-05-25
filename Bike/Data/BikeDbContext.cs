@@ -11,5 +11,6 @@ namespace Bike.Data
         }
 
         public DbSet<FuelLog> FuelLogs { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
