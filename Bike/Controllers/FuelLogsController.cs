@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Bike.Data;
 using Bike.Models;
 using System;
@@ -55,6 +55,21 @@ namespace Bike.Controllers
         // Monthly（画面枠）
         public IActionResult Monthly()
         {
+            var logs = _context.FuelLogs
+                .Where(x => x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
+                .ToList();
+
+            double totalFuel = logs.Sum(x => x.FuelLiter);
+            double totalDistance = logs.Sum(x => x.DistanceKm);
+            double totalCost = logs.Sum(x => x.Cost ?? 0);
+            double averageEfficiency = totalFuel > 0 ? totalDistance / totalFuel : 0;
+
+            ViewBag.TotalFuel = totalFuel;
+            ViewBag.TotalDistance = totalDistance;
+            ViewBag.TotalCost = totalCost;
+            ViewBag.AverageEfficiency = averageEfficiency;
+            ViewBag.MonthYear = DateTime.UtcNow.ToString("MMMM yyyy");
+
             return View();
         }
 
@@ -71,8 +86,20 @@ namespace Bike.Controllers
         [HttpPost]
         public IActionResult Create(FuelLog log)
         {
-            log.CreatedAt = DateTime.UtcNow;
+            if (log == null)
+            {
+                return BadRequest("Invalid data submitted.");
+            }
+
+            // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
+            if (log.UserId == 0)
+            {
+                log.UserId = 1;
+            }
+
+            // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
+            log.CreatedAt = DateTime.UtcNow;
             log.Currency ??= "VND";
 
             _context.FuelLogs.Add(log);

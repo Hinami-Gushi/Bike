@@ -1,3 +1,4 @@
+using Bike.Data;
 using Bike.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -6,9 +7,17 @@ namespace Bike.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly BikeDbContext _context;
+
+        public HomeController(BikeDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            var logs = _context.FuelLogs.ToList() ?? new List<FuelLog>();
+            return View(logs);
         }
 
         public IActionResult Privacy()
