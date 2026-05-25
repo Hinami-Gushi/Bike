@@ -12,8 +12,29 @@
     var totalDistance = (double)(ViewBag.TotalDistance ?? 0d);
     var latest = (double)(ViewBag.LatestEfficiency ?? 0d);
 
-    string currencyLabel = "VND";
+    string currencyLabel = Context.Session.GetString("currency") ?? "USD";
     string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
+
+    // Translations
+    var t = new Dictionary<string, Dictionary<string, string>>
+    {
+        ["en"] = new() {
+            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
+            ["AvgEfficiency"] = "AVG EFFICIENCY", ["TotalFuel"] = "TOTAL FUEL", ["MonthCost"] = "THIS MONTH COST", 
+            ["TotalDistance"] = "TOTAL DISTANCE", ["LatestEfficiency"] = "LATEST EFFICIENCY", ["AddFuelLog"] = "＋ Add Fuel Log"
+        },
+        ["ja"] = new() {
+            ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
+            ["AvgEfficiency"] = "平均燃費", ["TotalFuel"] = "総給油量", ["MonthCost"] = "今月の燃料費", 
+            ["TotalDistance"] = "総走行距離", ["LatestEfficiency"] = "直近の燃費", ["AddFuelLog"] = "＋ 給油記録を追加"
+        },
+        ["vi"] = new() {
+            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
+            ["AvgEfficiency"] = "HIỆU SUẤT TRUNG BÌNH", ["TotalFuel"] = "TỔNG NHIÊN LIỆU", ["MonthCost"] = "CHI PHÍ THÁNG NÀY", 
+            ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG", ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT", ["AddFuelLog"] = "＋ Thêm Nhật ký Nhiên liệu"
+        }
+    };
+    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 }
 
 <div class="bfl-page">

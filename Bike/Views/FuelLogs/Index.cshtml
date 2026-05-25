@@ -1,4 +1,4 @@
-﻿@model List<Bike.Models.FuelLog>
+@model List<Bike.Models.FuelLog>
 @using System.Globalization
 
 @{
@@ -7,13 +7,30 @@
 
     var lang = Context.Session.GetString("lang") ?? "en";
 
-    string title = "Fuel History";
+    string currencyLabel = Context.Session.GetString("currency") ?? "USD";
+    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
+
+    // Translations
+    var t = new Dictionary<string, Dictionary<string, string>>
+    {
+        ["en"] = new() {
+            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
+            ["HistoryTitle"] = "Fuel History", ["Records"] = "records", ["Record"] = "record"
+        },
+        ["ja"] = new() {
+            ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
+            ["HistoryTitle"] = "給油履歴", ["Records"] = "件の記録", ["Record"] = "件の記録"
+        },
+        ["vi"] = new() {
+            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
+            ["HistoryTitle"] = "Lịch sử Nhiên liệu", ["Records"] = "bản ghi", ["Record"] = "bản ghi"
+        }
+    };
+    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 
     var count = Model?.Count ?? 0;
-    string countText = count == 1 ? "1 record" : $"{count} records";
-
-    string currencyLabel = "JPY";
-    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
+    string countSuffix = count == 1 ? currentT["Record"] : currentT["Records"];
+    string countText = $"{count} {countSuffix}";
 }
 
 <div class="bfl-page">
@@ -80,7 +97,7 @@
             {
                 <div class="bfl-history-card">
                     <div class="bfl-history-top">
-                        <div class="bfl-history-date">@item.FuelDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)</div>
+                        <div class="bfl-history-date">@item.FuelDate.ToString("yyyy/MM/dd")</div>
 
                         <div class="bfl-history-actions">
                             <a class="bfl-icon-btn" href="/FuelLogs/Edit/@item.Id" aria-label="Edit">
@@ -98,6 +115,7 @@
                     <div class="bfl-history-mid">
                         <div class="bfl-history-metric"><span class="bfl-dot"></span>@item.FuelLiter.ToString("0.0") L</div>
                         <div class="bfl-history-metric"><span class="bfl-dot"></span>@item.DistanceKm.ToString("0.0") km</div>
+                        <div class="bfl-history-metric"><span class="bfl-dot"></span>@(item.Cost?.ToString("#,0") ?? "-") @item.Currency</div>
                     </div>
                 </div>
             }

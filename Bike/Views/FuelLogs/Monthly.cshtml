@@ -3,7 +3,7 @@
     ViewData["Title"] = "Monthly";
 
     var lang = Context.Session.GetString("lang") ?? "en";
-    string currencyLabel = "JPY";
+    string currencyLabel = Context.Session.GetString("currency") ?? "USD";
     string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
 
     double totalFuel = ViewBag.TotalFuel;
@@ -11,6 +11,24 @@
     double totalCost = ViewBag.TotalCost;
     double averageEfficiency = ViewBag.AverageEfficiency;
     string monthYear = ViewBag.MonthYear;
+
+    // Translations
+    var t = new Dictionary<string, Dictionary<string, string>>
+    {
+        ["en"] = new() {
+            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
+            ["MonthlyTitle"] = "Monthly Cost", ["Badge"] = "1 month", ["Fuel"] = "fuel", ["Distance"] = "distance", ["Efficiency"] = "efficiency"
+        },
+        ["ja"] = new() {
+            ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
+            ["MonthlyTitle"] = "月間燃料費", ["Badge"] = "1ヶ月間", ["Fuel"] = "給油量", ["Distance"] = "距離", ["Efficiency"] = "燃費"
+        },
+        ["vi"] = new() {
+            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
+            ["MonthlyTitle"] = "Chi phí hàng tháng", ["Badge"] = "1 tháng", ["Fuel"] = "nhiên liệu", ["Distance"] = "quãng đường", ["Efficiency"] = "hiệu suất"
+        }
+    };
+    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 }
 
 <div class="bfl-page">
