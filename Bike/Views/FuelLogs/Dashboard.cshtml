@@ -21,30 +21,36 @@
         ["en"] = new() {
             ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
             ["AvgEfficiency"] = "AVG EFFICIENCY", ["TotalFuel"] = "TOTAL FUEL", ["MonthCost"] = "THIS MONTH COST", 
-            ["TotalDistance"] = "TOTAL DISTANCE", ["LatestEfficiency"] = "LATEST EFFICIENCY", ["AddFuelLog"] = "＋ Add Fuel Log"
+            ["TotalDistance"] = "TOTAL DISTANCE", ["LatestEfficiency"] = "LATEST EFFICIENCY", ["AddFuelLog"] = "＋ Add Fuel Log",
+            ["Logout"] = "Logout"
         },
         ["ja"] = new() {
             ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
             ["AvgEfficiency"] = "平均燃費", ["TotalFuel"] = "総給油量", ["MonthCost"] = "今月の燃料費", 
-            ["TotalDistance"] = "総走行距離", ["LatestEfficiency"] = "直近の燃費", ["AddFuelLog"] = "＋ 給油記録を追加"
+            ["TotalDistance"] = "総走行距離", ["LatestEfficiency"] = "直近の燃費", ["AddFuelLog"] = "＋ 給油記録を追加",
+            ["Logout"] = "ログアウト"
         },
         ["vi"] = new() {
             ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
             ["AvgEfficiency"] = "HIỆU SUẤT TRUNG BÌNH", ["TotalFuel"] = "TỔNG NHIÊN LIỆU", ["MonthCost"] = "CHI PHÍ THÁNG NÀY", 
-            ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG", ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT", ["AddFuelLog"] = "＋ Thêm Nhật ký Nhiên liệu"
+            ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG", ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT", ["AddFuelLog"] = "＋ Thêm Nhật ký Nhiên liệu",
+            ["Logout"] = "Đăng xuất"
         }
     };
     var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
+
+    var userEmail = Context.Session.GetString("userEmail") ?? "";
 }
 
 <div class="bfl-page">
     <div class="bfl-topbar">
         <div class="bfl-brand">
             <div class="bfl-brand-title">🏍 Bike Fuel Log</div>
-            <div class="bfl-brand-sub">QTSC Field Tracker</div>
+            <div class="bfl-brand-sub">@userEmail</div>
         </div>
 
         <div class="bfl-topbar-actions">
+            <a href="/Account/Logout" class="bfl-pill bfl-pill-logout" style="text-decoration:none; background:#fee2e2; color:#991b1b;">@currentT["Logout"]</a>
             <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
 
             <div class="dropdown">
