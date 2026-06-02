@@ -12,6 +12,22 @@
 <body class="bfl-body">
 	@RenderBody()
 
+    <!-- Bike Image Modal -->
+    <div class="modal fade" id="bikeImageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 text-center">
+                    <img src="~/images/IMG_0496.jpeg" class="img-fluid rounded" alt="My Bike" style="max-height: 80vh;">
+                </div>
+                <div class="modal-footer border-0">
+                </div>
+            </div>
+        </div>
+    </div>
+
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
