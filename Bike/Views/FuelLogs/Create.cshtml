@@ -14,18 +14,18 @@
     {
         ["en"] = new() {
             ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
-            ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Fuel"] = "Fuel (L)", ["Distance"] = "Distance (km)",
-            ["Cost"] = "Cost", ["Optional"] = "(optional)", ["Save"] = "Save"
+            ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Cost"] = "Cost", ["Save"] = "Save",
+            ["Region"] = "Region", ["Vietnam"] = "Vietnam", ["Japan"] = "Japan", ["FullTank"] = "Full Tank"
         },
         ["ja"] = new() {
             ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
-            ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Fuel"] = "給油量 (L)", ["Distance"] = "走行距離 (km)",
-            ["Cost"] = "金額", ["Optional"] = "(任意)", ["Save"] = "保存"
+            ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Cost"] = "金額", ["Save"] = "保存",
+            ["Region"] = "地域", ["Vietnam"] = "ベトナム", ["Japan"] = "日本", ["FullTank"] = "満タン"
         },
         ["vi"] = new() {
             ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
-            ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Fuel"] = "Nhiên liệu (L)", ["Distance"] = "Quãng đường (km)",
-            ["Cost"] = "Chi phí", ["Optional"] = "(tùy chọn)", ["Save"] = "Lưu"
+            ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Cost"] = "Chi phí", ["Save"] = "Lưu",
+            ["Region"] = "Vùng", ["Vietnam"] = "Việt Nam", ["Japan"] = "Nhật Bản", ["FullTank"] = "Đầy bình"
         }
     };
     var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
@@ -88,27 +88,42 @@
         <div class="bfl-card bfl-form-card">
             <div class="bfl-form-title">🧾 @currentT["AddTitle"]</div>
 
-            <form asp-action="Create" method="post" class="bfl-form">
+            <form asp-action="Create" method="post" class="bfl-form" id="fuelForm">
+                @* Hidden inputs for Geolocation *@
+                <input type="hidden" name="Latitude" id="Latitude" />
+                <input type="hidden" name="Longitude" id="Longitude" />
+                <input type="hidden" name="Region" id="Region" value="VN" />
+
                 <div class="bfl-field">
                     <label class="bfl-label" asp-for="FuelDate">@currentT["Date"] <span class="bfl-required">*</span></label>
                     <input class="bfl-input" type="date" asp-for="FuelDate" value="@fuelDate" required />
                 </div>
 
-                <div class="bfl-row">
-                    <div class="bfl-field">
-                        <label class="bfl-label" asp-for="FuelLiter">@currentT["Fuel"] <span class="bfl-required">*</span></label>
-                        <input class="bfl-input" type="number" step="0.1" min="0" asp-for="FuelLiter" placeholder="e.g. 3.5" required />
-                    </div>
-
-                    <div class="bfl-field">
-                        <label class="bfl-label" asp-for="DistanceKm">@currentT["Distance"] <span class="bfl-required">*</span></label>
-                        <input class="bfl-input" type="number" step="0.1" min="0" asp-for="DistanceKm" placeholder="e.g. 120" required />
+                <div class="bfl-field">
+                    <label class="bfl-label">@currentT["Region"]</label>
+                    <div class="bfl-region-selector">
+                        <button type="button" class="bfl-region-btn is-active" id="btnVN" onclick="setRegion('VN')">🇻🇳 @currentT["Vietnam"]</button>
+                        <button type="button" class="bfl-region-btn" id="btnJP" onclick="setRegion('JP')">🇯🇵 @currentT["Japan"]</button>
                     </div>
                 </div>
 
                 <div class="bfl-field">
-                    <label class="bfl-label" asp-for="Cost">@currentT["Cost"] @currentT["Optional"]</label>
-                    <input class="bfl-input" type="number" step="0.1" min="0" asp-for="Cost" placeholder="50000" />
+                    <label class="bfl-label" id="costLabel" asp-for="Cost">@currentT["Cost"] (VND) <span class="bfl-required">*</span></label>
+                    <input class="bfl-input" type="number" step="1" min="0" asp-for="Cost" id="CostInput" placeholder="50000" required />
+                    
+                    @* Quick Buttons for Vietnam *@
+                    <div class="bfl-quick-group" id="quickVN">
+                        <button type="button" class="bfl-quick-btn" onclick="setCost(50000)">50,000 ₫</button>
+                        <button type="button" class="bfl-quick-btn" onclick="setCost(100000)">100,000 ₫</button>
+                        <button type="button" class="bfl-quick-btn" onclick="setFullTank()">@currentT["FullTank"]</button>
+                    </div>
+
+                    @* Quick Buttons for Japan *@
+                    <div class="bfl-quick-group bfl-hidden" id="quickJP">
+                        <button type="button" class="bfl-quick-btn" onclick="setCost(1000)">1,000 円</button>
+                        <button type="button" class="bfl-quick-btn" onclick="setCost(3000)">3,000 円</button>
+                        <button type="button" class="bfl-quick-btn" onclick="setFullTank()">@currentT["FullTank"]</button>
+                    </div>
                 </div>
 
                 <button class="bfl-submit" type="submit">@currentT["Save"]</button>
@@ -116,3 +131,87 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function setRegion(region) {
+            document.getElementById('Region').value = region;
+            const btnVN = document.getElementById('btnVN');
+            const btnJP = document.getElementById('btnJP');
+            const quickVN = document.getElementById('quickVN');
+            const quickJP = document.getElementById('quickJP');
+            const costLabel = document.getElementById('costLabel');
+            const costInput = document.getElementById('CostInput');
+
+            if (region === 'VN') {
+                btnVN.classList.add('is-active');
+                btnJP.classList.remove('is-active');
+                quickVN.classList.remove('bfl-hidden');
+                quickJP.classList.add('bfl-hidden');
+                costLabel.innerHTML = '@currentT["Cost"] (VND) <span class="bfl-required">*</span>';
+                costInput.placeholder = "50000";
+            } else {
+                btnJP.classList.add('is-active');
+                btnVN.classList.remove('is-active');
+                quickJP.classList.remove('bfl-hidden');
+                quickVN.classList.add('bfl-hidden');
+                costLabel.innerHTML = '@currentT["Cost"] (JPY) <span class="bfl-required">*</span>';
+                costInput.placeholder = "3000";
+            }
+        }
+
+        function setCost(amount) {
+            document.getElementById('CostInput').value = amount;
+        }
+
+        function setFullTank() {
+            // For now, we just focus the cost input as "Full Tank" cost varies
+            // You might want to set a flag or just let user type the actual pump price
+            document.getElementById('CostInput').focus();
+            alert("Please enter the total cost from the pump.");
+        }
+
+        // Geolocation logic
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            document.getElementById('Latitude').value = position.coords.latitude;
+            document.getElementById('Longitude').value = position.coords.longitude;
+            console.log("Location captured:", position.coords.latitude, position.coords.longitude);
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    console.warn("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    console.warn("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    console.warn("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    console.warn("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Run on load
+        window.onload = function() {
+            getLocation();
+        };
+
+        // Also try to capture right before submit if not already captured
+        document.getElementById('fuelForm').onsubmit = function() {
+            // Optional: check if captured, if not, try once more or proceed
+            return true;
+        };
+    </script>
+}

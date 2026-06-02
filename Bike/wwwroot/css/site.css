@@ -466,6 +466,60 @@ body {
   font-weight: 900;
 }
 
+/* --- Region Selector & Quick Buttons --- */
+.bfl-region-selector {
+    display: flex;
+    background: #e9ecef;
+    padding: 4px;
+    border-radius: 14px;
+    margin-bottom: 4px;
+}
+
+.bfl-region-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    border-radius: 11px;
+    font-weight: 800;
+    font-size: 14px;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.bfl-region-btn.is-active {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.bfl-quick-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.bfl-quick-btn {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 10px 4px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #374151;
+    transition: all 0.1s;
+}
+
+.bfl-quick-btn:active {
+    background: #f3f4f6;
+    transform: scale(0.96);
+}
+
+.bfl-hidden {
+    display: none;
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
