@@ -479,7 +479,7 @@ body {
     flex: 1;
     border: none;
     background: transparent;
-    padding: 10px;
+/*    padding: 10px;*/
     border-radius: 11px;
     font-weight: 800;
     font-size: 14px;
@@ -488,7 +488,7 @@ body {
 }
 
 .bfl-region-btn.is-active {
-    background: #ffffff;
+    background: lightblue;
     color: #111827;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }

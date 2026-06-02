@@ -44,10 +44,14 @@ namespace Bike.Controllers
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            var logs = _context.FuelLogs
+            string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+
+            var allLogs = _context.FuelLogs
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
+
+            var logs = allLogs.Where(x => x.Currency == selectedCurrency).ToList();
 
             double averageFuelEfficiency = logs.Any()
                 ? logs.Average(x => x.FuelEfficiency)
@@ -67,7 +71,7 @@ namespace Bike.Controllers
             ViewBag.TotalDistance = totalDistance;
             ViewBag.LatestEfficiency = latestEfficiency;
 
-            return View(logs);
+            return View(allLogs);
         }
 
         // Monthly（画面枠）
@@ -76,8 +80,13 @@ namespace Bike.Controllers
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
+            string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+
             var logs = _context.FuelLogs
-                .Where(x => x.UserId == userId && x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
+                .Where(x => x.UserId == userId && 
+                            x.FuelDate.Year == DateTime.UtcNow.Year && 
+                            x.FuelDate.Month == DateTime.UtcNow.Month &&
+                            x.Currency == selectedCurrency)
                 .ToList();
 
             double totalFuel = logs.Sum(x => x.FuelLiter);

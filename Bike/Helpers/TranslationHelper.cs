@@ -30,7 +30,8 @@ namespace Bike.Helpers
                 ["OneMonth"] = "1 month",
                 ["Fuel"] = "fuel",
                 ["Distance"] = "distance",
-                ["Efficiency"] = "efficiency"
+                ["Efficiency"] = "efficiency",
+                ["DeleteConfirm"] = "Are you sure you want to delete?"
             },
             ["ja"] = new()
             {
@@ -56,7 +57,8 @@ namespace Bike.Helpers
                 ["OneMonth"] = "1ヶ月",
                 ["Fuel"] = "燃料",
                 ["Distance"] = "距離",
-                ["Efficiency"] = "燃費"
+                ["Efficiency"] = "燃費",
+                ["DeleteConfirm"] = "本当に削除しますか？"
             },
             ["vi"] = new()
             {
@@ -82,7 +84,8 @@ namespace Bike.Helpers
                 ["OneMonth"] = "1 tháng",
                 ["Fuel"] = "nhiên liệu",
                 ["Distance"] = "khoảng cách",
-                ["Efficiency"] = "hiệu suất"
+                ["Efficiency"] = "hiệu suất",
+                ["DeleteConfirm"] = "Bạn có thực sự muốn xóa không?"
             }
         };
 
