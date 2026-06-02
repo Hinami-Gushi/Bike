@@ -135,14 +135,18 @@ namespace Bike.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(FuelLog log, string Region, double? Latitude, double? Longitude)
         {
+<<<<<<< Updated upstream
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
+=======
+>>>>>>> Stashed changes
             if (log == null)
             {
                 return BadRequest("Invalid data submitted.");
             }
 
+<<<<<<< Updated upstream
             log.UserId = userId.Value;
 
             // --- 自動計算ロジック (ベトナム・日本特化) ---
@@ -167,6 +171,15 @@ namespace Bike.Controllers
             // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
             log.DistanceKm = 0; 
 
+=======
+            // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
+            if (log.UserId == 0)
+            {
+                log.UserId = 1;
+            }
+
+            // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
+>>>>>>> Stashed changes
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;
 
