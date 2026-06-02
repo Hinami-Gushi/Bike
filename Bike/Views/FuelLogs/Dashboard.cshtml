@@ -14,30 +14,13 @@
 
     string currencyLabel = Context.Session.GetString("currency") ?? "USD";
     string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
-
-    // Translations
-    var t = new Dictionary<string, Dictionary<string, string>>
-    {
-        ["en"] = new() {
-            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
-            ["AvgEfficiency"] = "AVG EFFICIENCY", ["TotalFuel"] = "TOTAL FUEL", ["MonthCost"] = "THIS MONTH COST", 
-            ["TotalDistance"] = "TOTAL DISTANCE", ["LatestEfficiency"] = "LATEST EFFICIENCY", ["AddFuelLog"] = "＋ Add Fuel Log"
-        },
-        ["ja"] = new() {
-            ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
-            ["AvgEfficiency"] = "平均燃費", ["TotalFuel"] = "総給油量", ["MonthCost"] = "今月の燃料費", 
-            ["TotalDistance"] = "総走行距離", ["LatestEfficiency"] = "直近の燃費", ["AddFuelLog"] = "＋ 給油記録を追加"
-        },
-        ["vi"] = new() {
-            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
-            ["AvgEfficiency"] = "HIỆU SUẤT TRUNG BÌNH", ["TotalFuel"] = "TỔNG NHIÊN LIỆU", ["MonthCost"] = "CHI PHÍ THÁNG NÀY", 
-            ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG", ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT", ["AddFuelLog"] = "＋ Thêm Nhật ký Nhiên liệu"
-        }
-    };
-    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 }
 
+<link rel="stylesheet" href="~/css/map.css">
+
 <div class="bfl-page">
+
+    <!-- TOP -->
     <div class="bfl-topbar">
         <div class="bfl-brand">
             <div class="bfl-brand-title">🏍 Bike Fuel Log</div>
@@ -45,12 +28,15 @@
         </div>
 
         <div class="bfl-topbar-actions">
-            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
+            <div class="bfl-pill">@currencyLabel</div>
 
             <div class="dropdown">
-                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="bfl-pill dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown">
                     @langLabel
                 </button>
+
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
                     <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
@@ -60,64 +46,74 @@
         </div>
     </div>
 
+    <!-- NAV -->
     <div class="bfl-nav">
-        <a class="bfl-nav-item is-active" href="/FuelLogs/Dashboard">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3l9-8z"/></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("Dashboard", lang)</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Create">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6v-2z"/></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("Add", lang)</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Index">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2zM3 6h2v2H3V6zm0 5h2v2H3v-2zm0 5h2v2H3v-2z"/></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("History", lang)</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Monthly">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm13 8H6v10h14V10z"/></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("Monthly", lang)</span>
-        </a>
+        <a class="bfl-nav-item is-active" href="/FuelLogs/Dashboard">Dashboard</a>
+        <a class="bfl-nav-item" href="/FuelLogs/Create">Add</a>
+        <a class="bfl-nav-item" href="/FuelLogs/Index">History</a>
+        <a class="bfl-nav-item" href="/FuelLogs/Monthly">Monthly</a>
     </div>
 
+    <!-- CONTENT -->
     <div class="bfl-content">
+
+        <!-- STATS -->
         <div class="bfl-grid">
+
             <div class="bfl-card">
-                <div class="bfl-card-title">⚡ @TranslationHelper.T("AvgEfficiency", lang)</div>
-                <div class="bfl-card-value bfl-text-green">@avg.ToString("0.0")<span class="bfl-unit">km/L</span></div>
+                <div class="bfl-card-title">⚡ Avg Efficiency</div>
+                <div class="bfl-card-value">@avg.ToString("0.0") km/L</div>
             </div>
 
             <div class="bfl-card">
-                <div class="bfl-card-title">💧 @TranslationHelper.T("TotalFuel", lang)</div>
-                <div class="bfl-card-value bfl-text-blue">@totalFuel.ToString("0.0")<span class="bfl-unit">L</span></div>
+                <div class="bfl-card-title">💧 Total Fuel</div>
+                <div class="bfl-card-value">@totalFuel.ToString("0.0") L</div>
             </div>
 
             <div class="bfl-card">
-                <div class="bfl-card-title">💲 @TranslationHelper.T("ThisMonthCost", lang)</div>
-                <div class="bfl-card-value bfl-text-orange">@monthCost.ToString("#,0")<span class="bfl-unit">@currencyLabel</span></div>
+                <div class="bfl-card-title">💲 Monthly Cost</div>
+                <div class="bfl-card-value">@monthCost.ToString("#,0") @currencyLabel</div>
             </div>
 
             <div class="bfl-card">
-                <div class="bfl-card-title">/\\ @TranslationHelper.T("TotalDistance", lang)</div>
-                <div class="bfl-card-value bfl-text-green">@totalDistance.ToString("#,0")<span class="bfl-unit">km</span></div>
+                <div class="bfl-card-title">📏 Distance</div>
+                <div class="bfl-card-value">@totalDistance.ToString("#,0") km</div>
             </div>
+
         </div>
 
+        <!-- LATEST -->
         <div class="bfl-card bfl-card-wide">
-            <div class="bfl-card-title">🔥 @TranslationHelper.T("LatestEfficiency", lang)</div>
-            <div class="bfl-card-value bfl-text-green">@latest.ToString("0.00")<span class="bfl-unit">km/L</span></div>
+            <div class="bfl-card-title">🔥 Latest Efficiency</div>
+            <div class="bfl-card-value">@latest.ToString("0.00") km/L</div>
         </div>
 
-        <a class="bfl-primary-action" href="/FuelLogs/Create">＋ @TranslationHelper.T("AddFuelLog", lang)</a>
+        <!-- BUTTON -->
+        <a class="bfl-primary-action" href="/FuelLogs/Create">
+            ＋ Add Fuel Log
+        </a>
+
+        <!-- MAP SECTION -->
+        <div class="bfl-card bfl-card-wide">
+
+            <div class="bfl-card-title">
+                ⛽ Nearby Gas Stations
+            </div>
+
+            <button id="find-gas-button" type="button">
+                近くのガソリンスタンドを探す
+            </button>
+
+            <div id="map" style="height: 400px; width: 100%;"></div>
+
+        </div>
+
     </div>
 </div>
+
+<!-- Google Maps API（これ1つだけ！重要） -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&language=ja">
+</script>
+
+<!-- JS -->
+<script src="~/js/map.js"></script>

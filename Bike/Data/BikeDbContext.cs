@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Bike.Models;
+﻿using Bike.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bike.Data
 {

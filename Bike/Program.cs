@@ -23,4 +23,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=FuelLogs}/{action=Dashboard}/{id?}");
 
+Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
 app.Run();
