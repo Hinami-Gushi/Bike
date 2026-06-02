@@ -98,12 +98,8 @@ namespace Bike.Controllers
 
         private string HashPassword(string password)
         {
-            using var rng = RandomNumberGenerator.Create();
-            byte[] salt = new byte[16];
-            rng.GetBytes(salt);
-
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-            byte[] hash = pbkdf2.GetBytes(32);
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100000, HashAlgorithmName.SHA256, 32);
 
             return $"{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
         }
@@ -116,10 +112,9 @@ namespace Bike.Controllers
             byte[] salt = Convert.FromBase64String(parts[0]);
             byte[] storedHash = Convert.FromBase64String(parts[1]);
 
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-            byte[] testHash = pbkdf2.GetBytes(32);
+            byte[] testHash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100000, HashAlgorithmName.SHA256, 32);
 
-            return storedHash.SequenceEqual(testHash);
+            return CryptographicOperations.FixedTimeEquals(storedHash, testHash);
         }
     }
 }

@@ -49,6 +49,15 @@ body {
   line-height: 1.1;
 }
 
+.bfl-brand-title.is-clickable {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.bfl-brand-title.is-clickable:hover {
+    opacity: 0.8;
+}
+
 .bfl-brand-sub {
   opacity: 0.9;
   font-weight: 600;
@@ -527,4 +536,64 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* --- Search Box --- */
+.bfl-search-box-compact {
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 14px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
+}
+
+.bfl-input-sm {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 14px;
+    font-weight: 700;
+    outline: none;
+    background-color: #f9fafb;
+    height: 36px;
+}
+
+.bfl-input-sm:focus {
+    border-color: #1f9d73;
+    box-shadow: 0 0 0 3px rgba(31, 157, 115, 0.15);
+}
+
+.bfl-search-btn-sm {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+    flex-shrink: 0;
+}
+
+.bfl-search-btn-sm:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.bfl-toggle-search-btn {
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.bfl-toggle-search-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+    color: #111827;
 }
