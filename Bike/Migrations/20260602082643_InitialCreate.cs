@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bike.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserTable : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,21 @@ namespace Bike.Migrations
                 {
                     table.PrimaryKey("PK_fuel_logs", x => x.id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    email = table.Column<string>(type: "text", nullable: false),
+                    password_hash = table.Column<string>(type: "text", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_users", x => x.id);
+                });
         }
 
         /// <inheritdoc />
@@ -37,6 +52,9 @@ namespace Bike.Migrations
         {
             migrationBuilder.DropTable(
                 name: "fuel_logs");
+
+            migrationBuilder.DropTable(
+                name: "users");
         }
     }
 }
