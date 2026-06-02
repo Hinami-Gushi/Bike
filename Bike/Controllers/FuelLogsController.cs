@@ -3,16 +3,26 @@ using Bike.Data;
 using Bike.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace Bike.Controllers
 {
     public class FuelLogsController : Controller
     {
         private readonly BikeDbContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly string _appId;
+        private readonly string _statsDataId;
 
-        public FuelLogsController(BikeDbContext context)
+        public FuelLogsController(BikeDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _context = context;
+            _httpClient = httpClientFactory.CreateClient();
+            _appId = configuration["EStat:AppId"] ?? "";
+            _statsDataId = configuration["EStat:StatsDataId"] ?? "0003421913"; // 小売物価統計調査 (Regular Gasoline)
         }
 
         // 一覧
@@ -98,7 +108,7 @@ namespace Bike.Controllers
 
         // 保存
         [HttpPost]
-        public IActionResult Create(FuelLog log)
+        public async Task<IActionResult> Create(FuelLog log, string Region, double? Latitude, double? Longitude)
         {
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
@@ -110,17 +120,83 @@ namespace Bike.Controllers
 
             log.UserId = userId.Value;
 
-            // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
+            // --- 自動計算ロジック (ベトナム・日本特化) ---
+            const double PRICE_VN = 23000.0; // 1L = 23,000 VND
+
+            if (Region == "JP")
+            {
+                double priceJp = await GetJapanGasPriceAsync();
+                log.Currency = "JPY";
+                log.FuelLiter = (log.Cost ?? 0) / priceJp;
+            }
+            else // Default to VN
+            {
+                log.Currency = "VND";
+                log.FuelLiter = (log.Cost ?? 0) / PRICE_VN;
+            }
+
+            // --- 走行距離（Distance km）の自動計算の準備 ---
+            double currentLat = Latitude ?? 0;
+            double currentLng = Longitude ?? 0;
+
+            // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
+            log.DistanceKm = 0; 
+
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;
-            
-            string sessionCurrency = HttpContext.Session.GetString("currency") ?? "USD";
-            log.Currency ??= sessionCurrency;
 
             _context.FuelLogs.Add(log);
             _context.SaveChanges();
 
             return RedirectToAction("Dashboard");
+        }
+
+        private async Task<double> GetJapanGasPriceAsync()
+        {
+            try
+            {
+                // e-Stat API: 小売物価統計調査 (Regular Gasoline in Tokyo as proxy)
+                // cdCat01=07301 (Gasoline), cdArea=13101 (Tokyo)
+                string url = $"https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData?appId={_appId}&statsDataId={_statsDataId}&cdCat01=07301&cdArea=13101";
+                
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(content);
+                    var root = doc.RootElement;
+
+                    if (root.TryGetProperty("GET_STATS_DATA", out var getData) &&
+                        getData.TryGetProperty("STATISTICAL_DATA", out var statData) &&
+                        statData.TryGetProperty("DATA_INF", out var dataInf) &&
+                        dataInf.TryGetProperty("VALUE", out var values))
+                    {
+                        JsonElement latestEntry;
+                        if (values.ValueKind == JsonValueKind.Array)
+                        {
+                            latestEntry = values.EnumerateArray().LastOrDefault();
+                        }
+                        else
+                        {
+                            latestEntry = values;
+                        }
+
+                        if (latestEntry.TryGetProperty("$", out var priceVal))
+                        {
+                            if (double.TryParse(priceVal.GetString(), out double price))
+                            {
+                                return price;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching Japan gas price: {ex.Message}");
+            }
+
+            return 170.0; // Fallback value
         }
 
         // 編集画面
