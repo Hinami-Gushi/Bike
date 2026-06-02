@@ -8,7 +8,7 @@ builder.Services.AddDbContext<BikeDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddHttpClient();
 builder.Services.AddSession();
 
 var app = builder.Build();
