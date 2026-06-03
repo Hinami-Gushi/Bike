@@ -26,15 +26,46 @@ namespace Bike.Controllers
         }
 
         // 一覧
-        public IActionResult Index()
+        public IActionResult Index(DateTime? startDate, DateTime? endDate)
         {
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            var logs = _context.FuelLogs
-                .Where(x => x.UserId == userId)
+            var query = _context.FuelLogs.Where(x => x.UserId == userId);
+            bool isSearchActive = startDate.HasValue || endDate.HasValue;
+
+            if (startDate.HasValue)
+            {
+                var startUtc = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+                query = query.Where(x => x.FuelDate >= startUtc);
+            }
+
+            if (endDate.HasValue)
+            {
+                var endUtc = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+                query = query.Where(x => x.FuelDate <= endUtc);
+            }
+
+            // 検索条件がない場合は最新の10件を表示する
+            if (!isSearchActive)
+            {
+                query = query.Take(10);
+            }
+
+            var logs = query
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
+
+            // 検索結果の集計
+            ViewBag.SearchTotalFuel = logs.Sum(x => x.FuelLiter);
+            ViewBag.SearchTotalDistance = logs.Sum(x => x.DistanceKm);
+            ViewBag.SearchTotalJPY = logs.Where(x => x.Currency == "JPY").Sum(x => x.Cost ?? 0);
+            ViewBag.SearchTotalVND = logs.Where(x => x.Currency == "VND").Sum(x => x.Cost ?? 0);
+
+            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
+            ViewBag.IsSearchActive = isSearchActive;
+
             return View(logs);
         }
 
@@ -122,11 +153,11 @@ namespace Bike.Controllers
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
+
             if (log == null)
             {
                 return BadRequest("Invalid data submitted.");
             }
-
             log.UserId = userId.Value;
 
             // --- 自動計算ロジック (ベトナム・日本特化) ---
@@ -150,6 +181,15 @@ namespace Bike.Controllers
 
             // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
             log.DistanceKm = 0; 
+
+
+            // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
+            if (log.UserId == 0)
+            {
+                log.UserId = 1;
+            }
+
+            // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
 
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;

@@ -64,6 +64,7 @@ namespace Bike.Migrations
                     b.ToTable("fuel_logs");
                 });
 
+
             modelBuilder.Entity("Bike.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -91,6 +92,7 @@ namespace Bike.Migrations
 
                     b.ToTable("users");
                 });
+
 #pragma warning restore 612, 618
         }
     }

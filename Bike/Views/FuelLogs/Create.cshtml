@@ -4,6 +4,7 @@
     Layout = "_AppLayout";
     ViewData["Title"] = "Add";
 
+
     var lang = Context.Session.GetString("lang") ?? "en";
     string currencyLabel = Context.Session.GetString("currency") ?? "USD";
     string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
@@ -37,7 +38,7 @@
 <div class="bfl-page">
     <div class="bfl-topbar">
         <div class="bfl-brand">
-            <div class="bfl-brand-title">🏍 Bike Fuel Log</div>
+            <div class="bfl-brand-title is-clickable" data-bs-toggle="modal" data-bs-target="#bikeImageModal">🏍 Bike Fuel Log</div>
             <div class="bfl-brand-sub">QTSC Field Tracker</div>
         </div>
 
