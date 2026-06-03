@@ -94,13 +94,11 @@ namespace Bike.Controllers
 
             double totalFuel = logs.Sum(x => x.FuelLiter);
             double totalDistance = logs.Sum(x => x.DistanceKm);
-            double latestEfficiency = logs.FirstOrDefault()?.FuelEfficiency ?? 0;
 
             ViewBag.AverageFuelEfficiency = averageFuelEfficiency;
             ViewBag.MonthlyFuelCost = monthlyFuelCost;
             ViewBag.TotalFuel = totalFuel;
             ViewBag.TotalDistance = totalDistance;
-            ViewBag.LatestEfficiency = latestEfficiency;
 
             return View(allLogs);
         }
@@ -113,24 +111,33 @@ namespace Bike.Controllers
 
             string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
 
+            // 直近4ヶ月の開始日を算出
+            var fourMonthsAgo = DateTime.UtcNow.AddMonths(-3);
+            var startDate = new DateTime(fourMonthsAgo.Year, fourMonthsAgo.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
             var logs = _context.FuelLogs
                 .Where(x => x.UserId == userId && 
-                            x.FuelDate.Year == DateTime.UtcNow.Year && 
-                            x.FuelDate.Month == DateTime.UtcNow.Month &&
+                            x.FuelDate >= startDate &&
                             x.Currency == selectedCurrency)
                 .ToList();
 
-            double totalFuel = logs.Sum(x => x.FuelLiter);
-            double totalDistance = logs.Sum(x => x.DistanceKm);
-            double totalCost = logs.Sum(x => x.Cost ?? 0);
-            double averageEfficiency = totalFuel > 0 ? totalDistance / totalFuel : 0;
+            var monthlySummaries = logs
+                .GroupBy(x => new { x.FuelDate.Year, x.FuelDate.Month })
+                .Select(g => new 
+                {
+                    MonthYear = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM yyyy"),
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalFuel = g.Sum(x => x.FuelLiter),
+                    TotalDistance = g.Sum(x => x.DistanceKm),
+                    TotalCost = g.Sum(x => x.Cost ?? 0),
+                    AverageEfficiency = g.Sum(x => x.FuelLiter) > 0 ? g.Sum(x => x.DistanceKm) / g.Sum(x => x.FuelLiter) : 0
+                })
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Month)
+                .ToList();
 
-            ViewBag.TotalFuel = totalFuel;
-            ViewBag.TotalDistance = totalDistance;
-            ViewBag.TotalCost = totalCost;
-            ViewBag.AverageEfficiency = averageEfficiency;
-            ViewBag.MonthYear = DateTime.UtcNow.ToString("MMMM yyyy");
-
+            ViewBag.MonthlySummaries = monthlySummaries;
             return View();
         }
 

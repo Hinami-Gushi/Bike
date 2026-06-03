@@ -1,17 +1,15 @@
 @{
-    Layout = "_AppLayout";
     ViewData["Title"] = "Register";
+    ViewData["HideNav"] = "true";
     var lang = Context.Session.GetString("lang") ?? "en";
 
     var t = new Dictionary<string, Dictionary<string, string>>
     {
-        ["en"] = new() { ["Register"] = "Register", ["Email"] = "Email", ["Password"] = "Password", ["HaveAccount"] = "Already have an account?", ["Login"] = "Login here", ["ErrEmailRegistered"] = "Email already registered." },
-        ["ja"] = new() { ["Register"] = "ユーザー登録", ["Email"] = "メールアドレス", ["Password"] = "パスワード", ["HaveAccount"] = "すでにアカウントをお持ちの方", ["Login"] = "ログインはこちら", ["ErrEmailRegistered"] = "このメールアドレスは既に登録されています。" },
-        ["vi"] = new() { ["Register"] = "Đăng ký", ["Email"] = "Email", ["Password"] = "Mật khẩu", ["HaveAccount"] = "Đã có tài khoản?", ["Login"] = "Đăng nhập tại đây", ["ErrEmailRegistered"] = "Email này đã được đăng ký." }
+        ["en"] = new() { ["Register"] = "Create Account", ["Email"] = "Email", ["Password"] = "Password", ["HaveAccount"] = "Already have an account?", ["Login"] = "Login here", ["ErrEmailRegistered"] = "Email already registered.", ["Join"] = "Join Bike Log" },
+        ["ja"] = new() { ["Register"] = "新規登録", ["Email"] = "メールアドレス", ["Password"] = "パスワード", ["HaveAccount"] = "すでにアカウントをお持ちの方", ["Login"] = "ログインはこちら", ["ErrEmailRegistered"] = "このメールアドレスは既に登録されています。", ["Join"] = "Bike Log を始める" },
+        ["vi"] = new() { ["Register"] = "Tạo tài khoản", ["Email"] = "Email", ["Password"] = "Mật khẩu", ["HaveAccount"] = "Đã có tài khoản?", ["Login"] = "Đăng nhập tại đây", ["ErrEmailRegistered"] = "Email này đã được đăng ký.", ["Join"] = "Tham gia Bike Log" }
     };
     var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
-    string currencyLabel = Context.Session.GetString("currency") ?? "USD";
-    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
 
     string errorMsg = "";
     if (ViewBag.ErrorKey != null && currentT.ContainsKey(ViewBag.ErrorKey)) {
@@ -19,52 +17,71 @@
     }
 }
 
-<div class="bfl-page bfl-auth-page">
-    <div class="bfl-topbar">
-        <div class="bfl-brand">
-            <div class="bfl-brand-title is-clickable" data-bs-toggle="modal" data-bs-target="#bikeImageModal">🏍 Bike Fuel Log</div>
-            <div class="bfl-brand-sub">Welcome</div>
+<div class="row justify-content-center align-items-center min-vh-100 py-5">
+    <div class="col-12" style="max-width: 1000px; width: 90%;">
+        <div class="text-center mb-5">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 80px; height: 80px;">
+                <span class="fs-1">📝</span>
+            </div>
+            <h1 class="fw-bold h2">@currentT["Join"]</h1>
+            <p class="text-muted">Start tracking your fuel logs today</p>
         </div>
 
-        <div class="bfl-topbar-actions">
-            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="h4 fw-bold mb-4 text-center text-md-start">@currentT["Register"]</h2>
+                        
+                        @if (!string.IsNullOrEmpty(errorMsg)) {
+                            <div class="alert alert-danger border-0 shadow-sm rounded-3 small py-2 text-center">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i> @errorMsg
+                            </div>
+                        }
 
-            <div class="dropdown">
-                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    @langLabel
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
-                    <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
-                    <li><a class="dropdown-item" href="/Language/Set?lang=vi">Tiếng Việt</a></li>
-                </ul>
+                        <form asp-action="Register" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">@currentT["Email"]</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                                    <input class="form-control border-start-0 ps-0" type="email" name="email" placeholder="name@example.com" required />
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">@currentT["Password"]</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-shield-lock"></i></span>
+                                    <input class="form-control border-start-0 ps-0" type="password" name="password" placeholder="••••••••" required />
+                                </div>
+                            </div>
+                            <div class="d-grid mb-4">
+                                <button class="btn btn-primary btn-lg py-3 shadow-sm fw-bold" type="submit">
+                                    @currentT["Register"]
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="text-center">
+                            <p class="text-muted small mb-0">
+                                @currentT["HaveAccount"] <a href="/Account/Login" class="text-primary fw-bold text-decoration-none">@currentT["Login"]</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="bfl-content">
-        <div class="bfl-card bfl-form-card">
-            <div class="bfl-form-title">📝 @currentT["Register"]</div>
-            
-            @if (!string.IsNullOrEmpty(errorMsg)) {
-                <div class="alert alert-danger">@errorMsg</div>
-            }
-
-            <form asp-action="Register" method="post" class="bfl-form">
-                <div class="bfl-field">
-                    <label class="bfl-label">@currentT["Email"]</label>
-                    <input class="bfl-input" type="email" name="email" required />
-                </div>
-                <div class="bfl-field">
-                    <label class="bfl-label">@currentT["Password"]</label>
-                    <input class="bfl-input" type="password" name="password" required />
-                </div>
-                <button class="bfl-submit" type="submit">@currentT["Register"]</button>
-            </form>
-
-            <div class="mt-3 text-center">
-                <small class="text-muted">@currentT["HaveAccount"] <a href="/Account/Login">@currentT["Login"]</a></small>
+        <div class="mt-5 text-center">
+            <div class="btn-group shadow-sm rounded-pill overflow-hidden bg-white p-1">
+                <a class="btn btn-sm @(lang == "en" ? "btn-primary" : "btn-white border-0 text-muted") rounded-pill px-3" href="/Language/Set?lang=en">EN</a>
+                <a class="btn btn-sm @(lang == "ja" ? "btn-primary" : "btn-white border-0 text-muted") rounded-pill px-3" href="/Language/Set?lang=ja">JA</a>
+                <a class="btn btn-sm @(lang == "vi" ? "btn-primary" : "btn-white border-0 text-muted") rounded-pill px-3" href="/Language/Set?lang=vi">VI</a>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .btn-white { background: white; }
+    .btn-white:hover { background: #f8fafc; }
+</style>

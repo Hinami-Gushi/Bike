@@ -1,126 +1,81 @@
 @model Bike.Models.FuelLog
 
 @{
-    Layout = "_AppLayout";
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Log";
 
     var lang = Context.Session.GetString("lang") ?? "en";
     string currencyLabel = Model.Currency ?? "VND";
-    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
     var fuelDate = (Model?.FuelDate ?? DateTime.Today).ToString("yyyy-MM-dd");
 
     // Translations
     var t = new Dictionary<string, Dictionary<string, string>>
     {
-        ["en"] = new() {
-            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
-            ["EditTitle"] = "Edit Fuel Log", ["Date"] = "Date", ["Fuel"] = "Fuel (L)", ["Distance"] = "Distance (km)",
-            ["Cost"] = "Cost", ["Optional"] = "(optional)", ["Currency"] = "Currency", ["Save"] = "Save", ["Back"] = "Back", ["Edit"] = "Edit"
-        },
-        ["ja"] = new() {
-            ["Dashboard"] = "ダッシュボード", ["Add"] = "追加", ["History"] = "履歴", ["Monthly"] = "月間集計",
-            ["EditTitle"] = "給油記録の編集", ["Date"] = "日付", ["Fuel"] = "給油量 (L)", ["Distance"] = "走行距離 (km)",
-            ["Cost"] = "金額", ["Optional"] = "(任意)", ["Currency"] = "通貨", ["Save"] = "保存", ["Back"] = "戻る", ["Edit"] = "編集"
-        },
-        ["vi"] = new() {
-            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
-            ["EditTitle"] = "Sửa Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Fuel"] = "Nhiên liệu (L)", ["Distance"] = "Quãng đường (km)",
-            ["Cost"] = "Chi phí", ["Optional"] = "(tùy chọn)", ["Currency"] = "Tiền tệ", ["Save"] = "Lưu", ["Back"] = "Quay lại", ["Edit"] = "Sửa"
-        }
+        ["en"] = new() { ["EditTitle"] = "Edit Fuel Log", ["Date"] = "Date", ["Fuel"] = "Fuel (L)", ["Distance"] = "Distance (km)", ["Cost"] = "Cost", ["Currency"] = "Currency", ["Save"] = "Save", ["Back"] = "Back" },
+        ["ja"] = new() { ["EditTitle"] = "給油記録の編集", ["Date"] = "日付", ["Fuel"] = "給油量 (L)", ["Distance"] = "走行距離 (km)", ["Cost"] = "金額", ["Currency"] = "通貨", ["Save"] = "保存", ["Back"] = "戻る" },
+        ["vi"] = new() { ["EditTitle"] = "Sửa Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Fuel"] = "Nhiên liệu (L)", ["Distance"] = "Quãng đường (km)", ["Cost"] = "Chi phí", ["Currency"] = "Tiền tệ", ["Save"] = "Lưu", ["Back"] = "Quay lại" }
     };
     var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 }
 
-<div class="bfl-page">
-    <div class="bfl-topbar">
-        <div class="bfl-brand">
-            <div class="bfl-brand-title is-clickable" data-bs-toggle="modal" data-bs-target="#bikeImageModal">🏍 Bike Fuel Log</div>
-            <div class="bfl-brand-sub">QTSC Field Tracker</div>
-        </div>
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    <h2 class="h4 mb-0 fw-bold">@currentT["EditTitle"]</h2>
+                </div>
 
-        <div class="bfl-topbar-actions">
-            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
+                <form method="post">
+                    <input type="hidden" name="Id" value="@Model.Id" />
 
-            <div class="dropdown">
-                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    @langLabel
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
-                    <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
-                    <li><a class="dropdown-item" href="/Language/Set?lang=vi">Tiếng Việt</a></li>
-                </ul>
+                    <div class="mb-4">
+                        <label class="form-label">@currentT["Date"]</label>
+                        <input class="form-control form-control-lg shadow-sm" type="date" name="FuelDate" value="@fuelDate" required />
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label">@currentT["Fuel"]</label>
+                            <div class="input-group shadow-sm">
+                                <input class="form-control border-end-0" type="number" step="0.1" min="0" name="FuelLiter" value="@Model.FuelLiter" required />
+                                <span class="input-group-text bg-white text-muted border-start-0">L</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">@currentT["Distance"]</label>
+                            <div class="input-group shadow-sm">
+                                <input class="form-control border-end-0" type="number" step="0.1" min="0" name="DistanceKm" value="@Model.DistanceKm" required />
+                                <span class="input-group-text bg-white text-muted border-start-0">km</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">@currentT["Cost"]</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white text-muted border-end-0">@currencyLabel</span>
+                            <input class="form-control border-start-0" type="number" step="1" min="0" name="Cost" value="@Model.Cost" />
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label">@currentT["Currency"]</label>
+                        <input class="form-control shadow-sm" type="text" name="Currency" value="@currencyLabel" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary btn-lg py-3 shadow-lg" type="submit">
+                            <i class="bi bi-check2-circle me-1"></i> @currentT["Save"]
+                        </button>
+                        <a href="/FuelLogs/Index" class="btn btn-light btn-lg py-3 border">
+                            @currentT["Back"]
+                        </a>
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
-
-    <div class="bfl-nav">
-        <a class="bfl-nav-item" href="/FuelLogs/Dashboard">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3l9-8z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["Dashboard"]</span>
-        </a>
-
-        <a class="bfl-nav-item is-active" href="#">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm18-11.5a1.003 1.003 0 0 0 0-1.42l-1.34-1.34a1.003 1.003 0 0 0-1.42 0l-1.13 1.13 3.75 3.75 1.14-1.12z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["Edit"]</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2zM3 6h2v2H3V6zm0 5h2v2H3v-2zm0 5h2v2H3v-2z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["History"]</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Monthly">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm13 8H6v10h14V10z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["Monthly"]</span>
-        </a>
-    </div>
-
-    <div class="bfl-content">
-        <div class="bfl-card bfl-form-card">
-            <div class="bfl-form-title">✏️ @currentT["EditTitle"]</div>
-
-            <form method="post" class="bfl-form">
-                <input type="hidden" name="Id" value="@Model.Id" />
-
-                <div class="bfl-field">
-                    <label class="bfl-label">@currentT["Date"] <span class="bfl-required">*</span></label>
-                    <input class="bfl-input" type="date" name="FuelDate" value="@fuelDate" required />
-                </div>
-
-                <div class="bfl-row">
-                    <div class="bfl-field">
-                        <label class="bfl-label">@currentT["Fuel"] <span class="bfl-required">*</span></label>
-                        <input class="bfl-input" type="number" step="0.1" min="0" name="FuelLiter" value="@Model.FuelLiter" required />
-                    </div>
-
-                    <div class="bfl-field">
-                        <label class="bfl-label">@currentT["Distance"] <span class="bfl-required">*</span></label>
-                        <input class="bfl-input" type="number" step="0.1" min="0" name="DistanceKm" value="@Model.DistanceKm" required />
-                    </div>
-                </div>
-
-                <div class="bfl-field">
-                    <label class="bfl-label">@currentT["Cost"] @currentT["Optional"]</label>
-                    <input class="bfl-input" type="number" step="0.1" min="0" name="Cost" value="@Model.Cost" />
-                </div>
-
-                <div class="bfl-field">
-                    <label class="bfl-label">@currentT["Currency"]</label>
-                    <input class="bfl-input" type="text" name="Currency" value="@currencyLabel" />
-                </div>
-
-                <button class="bfl-submit" type="submit">@currentT["Save"]</button>
-                <a class="bfl-link" href="/FuelLogs">@currentT["Back"]</a>
-            </form>
         </div>
     </div>
 </div>

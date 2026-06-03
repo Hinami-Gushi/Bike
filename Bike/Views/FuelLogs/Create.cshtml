@@ -1,137 +1,98 @@
 @model Bike.Models.FuelLog
 
 @{
-    Layout = "_AppLayout";
-    ViewData["Title"] = "Add";
-
+    ViewData["Title"] = "Add Log";
 
     var lang = Context.Session.GetString("lang") ?? "en";
     string currencyLabel = Context.Session.GetString("currency") ?? "USD";
-    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
     var fuelDate = (Model?.FuelDate ?? DateTime.Today).ToString("yyyy-MM-dd");
 
-    // Translations
+    // Translations for this view
     var t = new Dictionary<string, Dictionary<string, string>>
     {
-        ["en"] = new() {
-            ["Dashboard"] = "Dashboard", ["Add"] = "Add", ["History"] = "History", ["Monthly"] = "Monthly",
-            ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Cost"] = "Cost", ["Save"] = "Save",
-            ["Region"] = "Region", ["Vietnam"] = "Vietnam", ["Japan"] = "Japan", ["FullTank"] = "Full Tank"
-        },
-        ["ja"] = new() {
-            ["Dashboard"] = "ダッシュボード",
-            ["Add"] = "追加",
-            ["History"] = "履歴",
-            ["Monthly"] = "月次",
-            ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Cost"] = "金額", ["Save"] = "保存",
-            ["Region"] = "地域", ["Vietnam"] = "ベトナム", ["Japan"] = "日本", ["FullTank"] = "満タン"
-        },
-        ["vi"] = new() {
-            ["Dashboard"] = "Bảng điều khiển", ["Add"] = "Thêm", ["History"] = "Lịch sử", ["Monthly"] = "Hàng tháng",
-            ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Cost"] = "Chi phí", ["Save"] = "Lưu",
-            ["Region"] = "Vùng", ["Vietnam"] = "Việt Nam", ["Japan"] = "Nhật Bản", ["FullTank"] = "Đầy bình"
-        }
+        ["en"] = new() { ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Cost"] = "Cost", ["Save"] = "Save", ["Region"] = "Region", ["Vietnam"] = "Vietnam", ["Japan"] = "Japan" },
+        ["ja"] = new() { ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Cost"] = "金額", ["Save"] = "保存", ["Region"] = "地域", ["Vietnam"] = "ベトナム", ["Japan"] = "日本" },
+        ["vi"] = new() { ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Cost"] = "Chi phí", ["Save"] = "Lưu", ["Region"] = "Vùng", ["Vietnam"] = "Việt Nam", ["Japan"] = "Nhật Bản" }
     };
     var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
 }
 
-<div class="bfl-page">
-    <div class="bfl-topbar">
-        <div class="bfl-brand">
-            <div class="bfl-brand-title is-clickable" data-bs-toggle="modal" data-bs-target="#bikeImageModal">🏍 Bike Fuel Log</div>
-            <div class="bfl-brand-sub">QTSC Field Tracker</div>
-        </div>
+<div class="row justify-content-center">
+    <div class="col-12" style="max-width: 1000px; width: 90%;">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-5">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-plus-circle"></i>
+                    </div>
+                    <h2 class="h4 mb-0 fw-bold">@currentT["AddTitle"]</h2>
+                </div>
 
-        <div class="bfl-topbar-actions">
-            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
+                <form asp-action="Create" method="post" id="fuelForm">
+                    <input type="hidden" name="Latitude" id="Latitude" />
+                    <input type="hidden" name="Longitude" id="Longitude" />
+                    <input type="hidden" name="Region" id="Region" value="VN" />
 
-            <div class="dropdown">
-                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    @langLabel
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
-                    <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
-                    <li><a class="dropdown-item" href="/Language/Set?lang=vi">Tiếng Việt</a></li>
-                </ul>
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">@currentT["Date"]</label>
+                            <input class="form-control form-control-lg" type="date" asp-for="FuelDate" value="@fuelDate" required />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">@currentT["Region"]</label>
+                            <div class="btn-group w-100 shadow-sm rounded-3 overflow-hidden" style="height: 48px;">
+                                <input type="radio" class="btn-check" name="region_toggle" id="btnVN" autocomplete="off" checked onclick="setRegion('VN')">
+                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnVN">🇻🇳 @currentT["Vietnam"]</label>
+
+                                <input type="radio" class="btn-check" name="region_toggle" id="btnJP" autocomplete="off" onclick="setRegion('JP')">
+                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnJP">🇯🇵 @currentT["Japan"]</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label d-flex justify-content-between" id="costLabel">
+                            <span>@currentT["Cost"] (VND)</span>
+                            <span class="text-danger small fw-bold">* Required</span>
+                        </label>
+                        <div class="input-group input-group-lg shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted" id="currencySymbol">₫</span>
+                            <input class="form-control border-start-0 ps-0" type="number" step="1" min="0" asp-for="Cost" id="CostInput" placeholder="50000" required />
+                        </div>
+                        
+                        <!-- Quick Buttons -->
+                        <div class="mt-3 d-flex flex-wrap gap-2" id="quickVN">
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(50000)">50,000 ₫</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(100000)">100,000 ₫</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(150000)">150,000 ₫</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(200000)">200,000 ₫</button>
+                        </div>
+
+                        <div class="mt-3 d-flex flex-wrap gap-2 d-none" id="quickJP">
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(1000)">1,000 円</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(3000)">3,000 円</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(5000)">5,000 円</button>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="d-grid">
+                                <button class="btn btn-success btn-lg py-3 shadow-lg fw-bold" type="submit">
+                                    <i class="bi bi-save me-2"></i> @currentT["Save"]
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>
-
-    <div class="bfl-nav">
-        <a class="bfl-nav-item" href="/FuelLogs/Dashboard">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3l9-8z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["Dashboard"]</span>
-        </a>
-
-        <a class="bfl-nav-item is-active" href="/FuelLogs/Create">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6v-2z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["Add"]</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2zM3 6h2v2H3V6zm0 5h2v2H3v-2zm0 5h2v2H3v-2z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["History"]</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Monthly">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm13 8H6v10h14V10z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@currentT["Monthly"]</span>
-        </a>
-    </div>
-
-    <div class="bfl-content">
-        <div class="bfl-card bfl-form-card">
-            <div class="bfl-form-title">🧾 @currentT["AddTitle"]</div>
-
-            <form asp-action="Create" method="post" class="bfl-form" id="fuelForm">
-                @* Hidden inputs for Geolocation *@
-                <input type="hidden" name="Latitude" id="Latitude" />
-                <input type="hidden" name="Longitude" id="Longitude" />
-                <input type="hidden" name="Region" id="Region" value="VN" />
-
-                <div class="bfl-field">
-                    <label class="bfl-label" asp-for="FuelDate">@currentT["Date"] <span class="bfl-required">*</span></label>
-                    <input class="bfl-input" type="date" asp-for="FuelDate" value="@fuelDate" required />
-                </div>
-
-                <div class="bfl-field">
-                    <label class="bfl-label">@currentT["Region"]</label>
-                    <div class="bfl-region-selector">
-                        <button type="button" class="bfl-region-btn is-active" id="btnVN" onclick="setRegion('VN')">🇻🇳 @currentT["Vietnam"]</button>
-                        <button type="button" class="bfl-region-btn" id="btnJP" onclick="setRegion('JP')">🇯🇵 @currentT["Japan"]</button>
-                    </div>
-                </div>
-
-                <div class="bfl-field">
-                    <label class="bfl-label" id="costLabel" asp-for="Cost">@currentT["Cost"] (VND) <span class="bfl-required">*</span></label>
-                    <input class="bfl-input" type="number" step="1" min="0" asp-for="Cost" id="CostInput" placeholder="50000" required />
-                    
-                    @* Quick Buttons for Vietnam *@
-                    <div class="bfl-quick-group" id="quickVN">
-                        <button type="button" class="bfl-quick-btn" onclick="setCost(50000)">50,000 ₫</button>
-                        <button type="button" class="bfl-quick-btn" onclick="setCost(100000)">100,000 ₫</button>
-                        <button type="button" class="bfl-quick-btn" onclick="setFullTank()">@currentT["FullTank"]</button>
-                    </div>
-
-                    @* Quick Buttons for Japan *@
-                    <div class="bfl-quick-group bfl-hidden" id="quickJP">
-                        <button type="button" class="bfl-quick-btn" onclick="setCost(1000)">1,000 円</button>
-                        <button type="button" class="bfl-quick-btn" onclick="setCost(3000)">3,000 円</button>
-                        <button type="button" class="bfl-quick-btn" onclick="setFullTank()">@currentT["FullTank"]</button>
-                    </div>
-                </div>
-
-                <button class="bfl-submit" type="submit">@currentT["Save"]</button>
-            </form>
+        
+        <div class="text-center mt-4">
+            <a href="/FuelLogs/Dashboard" class="text-muted text-decoration-none small fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </a>
         </div>
     </div>
 </div>
@@ -140,27 +101,24 @@
     <script>
         function setRegion(region) {
             document.getElementById('Region').value = region;
-            const btnVN = document.getElementById('btnVN');
-            const btnJP = document.getElementById('btnJP');
             const quickVN = document.getElementById('quickVN');
             const quickJP = document.getElementById('quickJP');
             const costLabel = document.getElementById('costLabel');
             const costInput = document.getElementById('CostInput');
+            const currencySymbol = document.getElementById('currencySymbol');
 
             if (region === 'VN') {
-                btnVN.classList.add('is-active');
-                btnJP.classList.remove('is-active');
-                quickVN.classList.remove('bfl-hidden');
-                quickJP.classList.add('bfl-hidden');
-                costLabel.innerHTML = '@currentT["Cost"] (VND) <span class="bfl-required">*</span>';
+                quickVN.classList.remove('d-none');
+                quickJP.classList.add('d-none');
+                costLabel.querySelector('span:first-child').innerText = '@currentT["Cost"] (VND)';
                 costInput.placeholder = "50000";
+                currencySymbol.innerText = "₫";
             } else {
-                btnJP.classList.add('is-active');
-                btnVN.classList.remove('is-active');
-                quickJP.classList.remove('bfl-hidden');
-                quickVN.classList.add('bfl-hidden');
-                costLabel.innerHTML = '@currentT["Cost"] (JPY) <span class="bfl-required">*</span>';
+                quickJP.classList.remove('d-none');
+                quickVN.classList.add('d-none');
+                costLabel.querySelector('span:first-child').innerText = '@currentT["Cost"] (JPY)';
                 costInput.placeholder = "3000";
+                currencySymbol.innerText = "¥";
             }
         }
 
@@ -168,54 +126,18 @@
             document.getElementById('CostInput').value = amount;
         }
 
-        function setFullTank() {
-            // For now, we just focus the cost input as "Full Tank" cost varies
-            // You might want to set a flag or just let user type the actual pump price
-            document.getElementById('CostInput').focus();
-            alert("Please enter the total cost from the pump.");
-        }
-
-        // Geolocation logic
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                console.error("Geolocation is not supported by this browser.");
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        document.getElementById('Latitude').value = pos.coords.latitude;
+                        document.getElementById('Longitude').value = pos.coords.longitude;
+                    },
+                    err => console.warn("Location error:", err.message)
+                );
             }
         }
 
-        function showPosition(position) {
-            document.getElementById('Latitude').value = position.coords.latitude;
-            document.getElementById('Longitude').value = position.coords.longitude;
-            console.log("Location captured:", position.coords.latitude, position.coords.longitude);
-        }
-
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    console.warn("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    console.warn("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    console.warn("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    console.warn("An unknown error occurred.");
-                    break;
-            }
-        }
-
-        // Run on load
-        window.onload = function() {
-            getLocation();
-        };
-
-        // Also try to capture right before submit if not already captured
-        document.getElementById('fuelForm').onsubmit = function() {
-            // Optional: check if captured, if not, try once more or proceed
-            return true;
-        };
+        window.onload = getLocation;
     </script>
 }
