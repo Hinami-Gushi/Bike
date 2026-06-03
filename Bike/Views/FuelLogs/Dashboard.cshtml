@@ -1,7 +1,6 @@
-﻿@model List<Bike.Models.FuelLog>
+@model List<Bike.Models.FuelLog>
 
 @{
-    Layout = "_AppLayout";
     ViewData["Title"] = "Dashboard";
 
     var lang = Context.Session.GetString("lang") ?? "en";
@@ -10,144 +9,248 @@
     var totalFuel = (double)(ViewBag.TotalFuel ?? 0d);
     var monthCost = (double)(ViewBag.MonthlyFuelCost ?? 0d);
     var totalDistance = (double)(ViewBag.TotalDistance ?? 0d);
-    var latest = (double)(ViewBag.LatestEfficiency ?? 0d);
 
     string currencyLabel = Context.Session.GetString("currency") ?? "USD";
-    string langLabel = (lang == "ja") ? "JA" : (lang == "vi") ? "VI" : "EN";
-
-    // Translations
-    var t = new Dictionary<string, Dictionary<string, string>>
-    {
-        ["en"] = new()
-        {
-            ["Dashboard"] = "Dashboard",
-            ["Add"] = "Add",
-            ["History"] = "History",
-            ["Monthly"] = "Monthly",
-            ["AvgEfficiency"] = "AVG EFFICIENCY",
-            ["TotalFuel"] = "TOTAL FUEL",
-            ["MonthCost"] = "THIS MONTH COST",
-            ["TotalDistance"] = "TOTAL DISTANCE",
-            ["LatestEfficiency"] = "LATEST EFFICIENCY",
-            ["AddFuelLog"] = "＋ Add Fuel Log",
-            ["Logout"] = "Logout"
-        },
-        ["ja"] = new()
-        {
-            ["Dashboard"] = "ダッシュボード",
-            ["Add"] = "追加",
-            ["History"] = "履歴",
-            ["Monthly"] = "月間集計",
-            ["AvgEfficiency"] = "平均燃費",
-            ["TotalFuel"] = "総給油量",
-            ["MonthCost"] = "今月の燃料費",
-            ["TotalDistance"] = "総走行距離",
-            ["LatestEfficiency"] = "直近の燃費",
-            ["AddFuelLog"] = "＋ 給油記録を追加",
-            ["Logout"] = "ログアウト"
-        },
-        ["vi"] = new()
-        {
-            ["Dashboard"] = "Bảng điều khiển",
-            ["Add"] = "Thêm",
-            ["History"] = "Lịch sử",
-            ["Monthly"] = "Hàng tháng",
-            ["AvgEfficiency"] = "HIỆU SUẤT TRUNG BÌNH",
-            ["TotalFuel"] = "TỔNG NHIÊN LIỆU",
-            ["MonthCost"] = "CHI PHÍ THÁNG NÀY",
-            ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG",
-            ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT",
-            ["AddFuelLog"] = "＋ Thêm Nhật ký Nhiên liệu",
-            ["Logout"] = "Đăng xuất"
-        }
-    };
-    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
-
-    var userEmail = Context.Session.GetString("userEmail") ?? "";
 }
 
-<div class="bfl-page">
-    <div class="bfl-topbar">
-        <div class="bfl-brand">
-            <div class="bfl-brand-title is-clickable" data-bs-toggle="modal" data-bs-target="#bikeImageModal">🏍 Bike Fuel Log</div>
-            <div class="bfl-brand-sub">@userEmail</div>
-        </div>
-
-        <div class="bfl-topbar-actions">
-            <a href="/Account/Logout" class="bfl-pill bfl-pill-logout" style="text-decoration:none; background:#fee2e2; color:#991b1b;">@currentT["Logout"]</a>
-            <div class="bfl-pill bfl-pill-currency">@currencyLabel</div>
-
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h1 class="h3 mb-0">@TranslationHelper.T("Dashboard", lang)</h1>
+        <p class="text-muted small mb-0">Overview of your bike's performance</p>
+    </div>
+    <div class="col-auto">
+        <div class="d-flex gap-2">
             <div class="dropdown">
-                <button class="bfl-pill bfl-pill-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    @langLabel
+                <button class="btn btn-white border shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-translate me-1"></i> @lang.ToUpper()
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                     <li><a class="dropdown-item" href="/Language/Set?lang=en">English</a></li>
                     <li><a class="dropdown-item" href="/Language/Set?lang=ja">日本語</a></li>
                     <li><a class="dropdown-item" href="/Language/Set?lang=vi">Tiếng Việt</a></li>
                 </ul>
             </div>
-        </div>
-    </div>
-
-    <div class="bfl-nav">
-        <a class="bfl-nav-item is-active" href="/FuelLogs/Dashboard">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v10h-5v-6H11v6H6V11H3l9-8z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("Dashboard", lang)</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Create">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6v-2z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("Add", lang)</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Index">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2zM3 6h2v2H3V6zm0 5h2v2H3v-2zm0 5h2v2H3v-2z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("History", lang)</span>
-        </a>
-
-        <a class="bfl-nav-item" href="/FuelLogs/Monthly">
-            <span class="bfl-nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm13 8H6v10h14V10z" /></svg>
-            </span>
-            <span class="bfl-nav-text">@TranslationHelper.T("Monthly", lang)</span>
-        </a>
-    </div>
-
-    <div class="bfl-content">
-        <div class="bfl-grid">
-            <div class="bfl-card">
-                <div class="bfl-card-title">⚡ @TranslationHelper.T("AvgEfficiency", lang)</div>
-                <div class="bfl-card-value bfl-text-green">@avg.ToString("0.0")<span class="bfl-unit">km/L</span></div>
-            </div>
-
-            <div class="bfl-card">
-                <div class="bfl-card-title">💧 @TranslationHelper.T("TotalFuel", lang)</div>
-                <div class="bfl-card-value bfl-text-blue">@totalFuel.ToString("0.0")<span class="bfl-unit">L</span></div>
-            </div>
-
-            <div class="bfl-card">
-                <div class="bfl-card-title">💲 @TranslationHelper.T("ThisMonthCost", lang)</div>
-                <div class="bfl-card-value bfl-text-orange">@monthCost.ToString("#,0")<span class="bfl-unit">@currencyLabel</span></div>
-            </div>
-
-            <div class="bfl-card">
-                <div class="bfl-card-title">/\\ @TranslationHelper.T("TotalDistance", lang)</div>
-                <div class="bfl-card-value bfl-text-green">@totalDistance.ToString("#,0")<span class="bfl-unit">km</span></div>
+            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm fw-bold text-success">
+                <i class="bi bi-currency-exchange me-1"></i> @currencyLabel
             </div>
         </div>
-
-        <div class="bfl-card bfl-card-wide">
-            <div class="bfl-card-title">🔥 @TranslationHelper.T("LatestEfficiency", lang)</div>
-            <div class="bfl-card-value bfl-text-green">@latest.ToString("0.00")<span class="bfl-unit">km/L</span></div>
-        </div>
-
-        <a class="bfl-primary-action" href="/FuelLogs/Create">＋ @TranslationHelper.T("AddFuelLog", lang)</a>
     </div>
 </div>
+
+<div class="row g-4 mb-5">
+    <!-- Stat Card: Efficiency -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Optimal</span>
+                </div>
+                <h6 class="text-muted fw-semibold mb-2">@TranslationHelper.T("AvgEfficiency", lang)</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="mb-0 fw-bold">@avg.ToString("0.0")</h2>
+                    <span class="text-muted small fw-bold">km/L</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Card: Total Fuel -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-droplet-fill"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted fw-semibold mb-2">@TranslationHelper.T("TotalFuel", lang)</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="mb-0 fw-bold text-primary">@totalFuel.ToString("0.0")</h2>
+                    <span class="text-muted small fw-bold">Liters</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Card: Monthly Cost -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted fw-semibold mb-2">@TranslationHelper.T("ThisMonthCost", lang)</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="mb-0 fw-bold text-warning">@monthCost.ToString("#,0")</h2>
+                    <span class="text-muted small fw-bold">@currencyLabel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Card: Total Distance -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-signpost-split-fill"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted fw-semibold mb-2">@TranslationHelper.T("TotalDistance", lang)</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="mb-0 fw-bold text-info">@totalDistance.ToString("#,0")</h2>
+                    <span class="text-muted small fw-bold">km</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">Recent Activity</h5>
+                    <a href="/FuelLogs/Index" class="btn btn-link text-success text-decoration-none fw-bold p-0">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0" style="border-spacing: 0;">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 rounded-start">Date</th>
+                                <th class="border-0">Fuel</th>
+                                <th class="border-0">Distance</th>
+                                <th class="border-0">Cost</th>
+                                <th class="border-0 rounded-end">Efficiency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Take(5))
+                            {
+                                <tr style="box-shadow: none; border-bottom: 1px solid #f1f5f9;">
+                                    <td class="py-3 fw-medium">@item.FuelDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="py-3">@item.FuelLiter.ToString("0.0") L</td>
+                                    <td class="py-3">@item.DistanceKm.ToString("0.0") km</td>
+                                    <td class="py-3">@item.Cost?.ToString("#,0") @item.Currency</td>
+                                    <td class="py-3">
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            @item.FuelEfficiency.ToString("0.0") km/L
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">Efficiency Trend</h5>
+                <div style="position: relative; height: 220px; width: 100%;">
+                    <canvas id="efficiencyChart"></canvas>
+                </div>
+                
+                <div class="mt-4 d-grid gap-2">
+                    <a href="/FuelLogs/Create" class="btn btn-success btn-lg py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                        <i class="bi bi-plus-circle-fill"></i> @TranslationHelper.T("AddFuelLog", lang)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('efficiencyChart').getContext('2d');
+            
+            // Prepare data from the model (last 7 logs for the trend)
+            const rawData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.OrderBy(x => x.FuelDate).TakeLast(7).Select(x => new { 
+                    date = x.FuelDate.ToString("MM/dd"), 
+                    eff = Math.Round(x.FuelEfficiency, 1) 
+                })
+            ));
+
+            const labels = rawData.map(d => d.date);
+            const data = rawData.map(d => d.eff);
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'km/L',
+                        data: data,
+                        borderColor: '#10b981',
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleFont: { family: 'Inter', weight: 'bold' },
+                            bodyFont: { family: 'Inter' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11 } }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { 
+                                font: { family: 'Inter', size: 11 },
+                                callback: function(value) { return value + ' km/L'; }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .btn-white {
+        background-color: white;
+        color: #1e293b;
+        border: none;
+    }
+    .btn-white:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+    }
+</style>

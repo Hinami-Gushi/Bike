@@ -1,599 +1,175 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+    --primary-color: #10b981; /* Emerald 500 */
+    --primary-hover: #059669; /* Emerald 600 */
+    --bg-light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --card-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    background-color: var(--bg-light);
+    overflow-x: hidden;
 }
 
-/* --- Dashboard（画像風UI）--- */
-.bfl-body {
-  margin: 0;
-    margin-bottom: 0;
+/* Sidebar Styling */
+.sidebar .nav-link {
+    transition: all 0.2s ease;
+    font-weight: 500;
 }
 
-.bfl-page {
-  background: #f6f7f9;
-  min-height: 100vh;
+.sidebar .nav-link:hover {
+    background-color: rgba(16, 185, 129, 0.05);
+    color: var(--primary-color) !important;
 }
 
-.bfl-topbar {
-  background: linear-gradient(180deg, #22a077 0%, #1f9d73 55%, #1c8f6a 100%);
-  color: #ffffff;
-  padding: 16px 16px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+.sidebar .nav-link.active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
 }
 
-.bfl-brand-title {
-  font-weight: 800;
-  font-size: 20px;
-  line-height: 1.1;
-}
-
-.bfl-brand-title.is-clickable {
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.bfl-brand-title.is-clickable:hover {
-    opacity: 0.8;
-}
-
-.bfl-brand-sub {
-  opacity: 0.9;
-  font-weight: 600;
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.bfl-topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.bfl-pill {
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 900;
-  letter-spacing: 0.4px;
-  line-height: 1;
-}
-
-.bfl-pill-currency {
-  background: #1f9d73;
-  color: #111827;
-  border: 1px solid rgba(0,0,0,0.35);
-}
-
-.bfl-pill-lang {
-  background: #ffffff;
-  color: #111827;
-  border: 1px solid rgba(0,0,0,0.18);
-}
-
-.bfl-nav {
-  padding: 10px 10px 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.bfl-nav-item {
-  text-decoration: none;
-  background: #ffffff;
-  border: 1px solid #c7c7c7;
-  border-radius: 14px;
-  padding: 12px 8px;
-  text-align: center;
-  color: #111827;
-}
-
-.bfl-nav-item.is-active {
-  border: 2px solid #111827;
-  background: #f3f1e8;
-}
-
-.bfl-nav-icon {
-  display: inline-flex;
-  width: 22px;
-  height: 22px;
-  margin-bottom: 6px;
-  color: #111827;
-}
-
-.bfl-nav-icon svg {
-  width: 22px;
-  height: 22px;
-  fill: currentColor;
-}
-
-.bfl-nav-text {
-  display: block;
-  font-weight: 700;
-  font-size: 13px;
-}
-
-.bfl-content {
-  padding: 12px;
-}
-
-.bfl-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.bfl-card {
-  background: #ffffff;
-  border: 1px solid #dcdcdc;
-  border-radius: 14px;
-  padding: 14px;
-}
-
-.bfl-card-wide {
-  margin-top: 12px;
-}
-
-.bfl-card-title {
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.6px;
-  color: #111827;
-  opacity: 0.85;
-  text-transform: uppercase;
-}
-
-.bfl-card-value {
-  margin-top: 8px;
-  font-size: 30px;
-  font-weight: 900;
-}
-
-/* --- Add Fuel Log form --- */
-.bfl-form-card {
-    padding: 18px;
-    border-radius: 18px;
-}
-
-.bfl-form-title {
-    font-size: 20px;
-    font-weight: 900;
-    margin-bottom: 14px;
-}
-
-.bfl-form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.bfl-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.bfl-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.bfl-label {
-    font-weight: 800;
-    font-size: 14px;
-    color: #111827;
-}
-
-.bfl-required {
-    color: #dc2626;
-}
-
-.bfl-input {
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    padding: 12px 12px;
-    font-size: 18px;
-    outline: none;
-}
-
-.bfl-input:focus {
-    border-color: #1f9d73;
-    box-shadow: 0 0 0 3px rgba(31, 157, 115, 0.15);
-}
-
-.bfl-submit {
-    margin-top: 6px;
-    width: 100%;
-    border-radius: 14px;
-    padding: 14px 12px;
-    font-weight: 900;
-    font-size: 18px;
-    background: #ffffff;
-    border: 1px solid #cfcfcf;
-    color: #111827;
-}
-
-.bfl-submit:hover {
-    border-color: rgba(0,0,0,0.28);
-}
-
-/* --- History list --- */
-.bfl-history-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 8px;
-    margin-bottom: 12px;
-}
-
-.bfl-history-title {
-    font-size: 22px;
-    font-weight: 900;
-    color: #111827;
-}
-
-.bfl-history-badge {
-    background: #e7f5ef;
-    color: #14532d;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-weight: 900;
-    font-size: 14px;
-}
-
-.bfl-history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.bfl-history-card {
-    background: #ffffff;
-    border: 1px solid #dcdcdc;
-    border-radius: 18px;
-    padding: 14px;
-  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
-}
-
-.bfl-history-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.bfl-history-date {
-    font-weight: 800;
-    color: #374151;
-}
-
-.bfl-history-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.bfl-inline {
-    display: inline;
-}
-
-.bfl-icon-btn {
-    width: 52px;
-    height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    border: 1px solid #d1d5db;
-    background: #ffffff;
-    color: #111827;
-    text-decoration: none;
-}
-
-.bfl-icon-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-}
-
-.bfl-history-mid {
-    margin-top: 12px;
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
-    color: #111827;
-    font-weight: 900;
-}
-
-.bfl-history-metric {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 20px;
-}
-
-.bfl-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-    background: #149465;
-    display: inline-block;
-}
-
-.bfl-history-bottom {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.bfl-history-cost {
-    font-weight: 800;
-    color: #6b7280;
-}
-
-.bfl-history-eff {
-    background: #e7f5ef;
-    color: #14532d;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-weight: 900;
-    font-size: 22px;
-}
-
-.bfl-unit {
-  font-size: 14px;
-  font-weight: 800;
-  margin-left: 2px;
-}
-
-/* --- Monthly Cost --- */
-.bfl-monthly-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 14px;
-    margin-bottom: 14px;
-}
-
-.bfl-monthly-title {
-    font-size: 20px;
-    font-weight: 900;
-    color: #111827;
-}
-
-.bfl-monthly-badge {
-    background: #e7f5ef;
-    color: #14532d;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-weight: 800;
-    font-size: 14px;
-}
-
-.bfl-monthly-card {
-    background: #ffffff;
-    border: 1px solid #dcdcdc;
-    border-radius: 18px;
-    padding: 24px 20px 10px;
-    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
-    position: relative;
-    overflow: hidden;
-}
-
-.bfl-monthly-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-}
-
-.bfl-monthly-date {
-    font-size: 22px;
-    font-weight: 900;
-    color: #111827;
-}
-
-.bfl-monthly-total {
-    background: #fdf2e9;
-    color: #9a3412;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-weight: 900;
-    font-size: 18px;
-}
-
-.bfl-monthly-metrics {
-    display: flex;
-    justify-content: space-between;
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.bfl-monthly-metric-item {
-    flex: 1;
-}
-
-.bfl-monthly-metric-value {
-    font-size: 20px;
-    font-weight: 900;
-    color: #149465;
-    margin-bottom: 4px;
-}
-
-.bfl-monthly-metric-label {
-    font-size: 14px;
-    font-weight: 700;
-    color: #6b7280;
-}
-
-.bfl-monthly-progress {
-    height: 6px;
-    background: #b45309;
-    border-radius: 999px;
-    margin: 0 4px;
-}
-
-.bfl-text-green { color: #149465; }
-.bfl-text-blue  { color: #3b82f6; }
-.bfl-text-orange{ color: #b45309; }
-
-.bfl-primary-action {
-  margin-top: 14px;
-  display: block;
-  width: 100%;
-  text-align: center;
-  text-decoration: none;
-  background: #ffffff;
-  color: #111827;
-  border: 1px solid #cfcfcf;
-  border-radius: 14px;
-  padding: 14px 12px;
-  font-weight: 900;
-}
-
-/* --- Region Selector & Quick Buttons --- */
-.bfl-region-selector {
-    display: flex;
-    background: #e9ecef;
-    padding: 4px;
-    border-radius: 14px;
-    margin-bottom: 4px;
-}
-
-.bfl-region-btn {
-    flex: 1;
+/* Modern Card Styling */
+.card {
     border: none;
-    background: transparent;
-/*    padding: 10px;*/
-    border-radius: 11px;
-    font-weight: 800;
-    font-size: 14px;
-    color: #6b7280;
-    transition: all 0.2s;
+    border-radius: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.bfl-region-btn.is-active {
-    background: lightblue;
-    color: #111827;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+.card:hover {
+    box-shadow: var(--card-shadow-hover);
 }
 
-.bfl-quick-group {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.bfl-quick-btn {
-    background: #ffffff;
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    padding: 10px 4px;
-    font-size: 13px;
-    font-weight: 800;
-    color: #374151;
-    transition: all 0.1s;
-}
-
-.bfl-quick-btn:active {
-    background: #f3f4f6;
-    transform: scale(0.96);
-}
-
-.bfl-hidden {
-    display: none;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
-
-/* --- Search Box --- */
-.bfl-search-box-compact {
-    background: #ffffff;
-    border: 1px solid #dcdcdc;
-    border-radius: 14px;
-    padding: 8px 12px;
-    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
-}
-
-.bfl-input-sm {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 6px 8px;
-    font-size: 14px;
+.card-title {
     font-weight: 700;
-    outline: none;
-    background-color: #f9fafb;
-    height: 36px;
+    color: #0f172a;
 }
 
-.bfl-input-sm:focus {
-    border-color: #1f9d73;
-    box-shadow: 0 0 0 3px rgba(31, 157, 115, 0.15);
+/* Typography Enhancements */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 800;
+    letter-spacing: -0.025em;
 }
 
-.bfl-search-btn-sm {
-    width: 36px;
-    height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background: #ffffff;
-    color: #111827;
-    flex-shrink: 0;
+.text-success {
+    color: var(--primary-color) !important;
 }
 
-.bfl-search-btn-sm:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
+/*.bg-success {
+    background-color: var(--primary-color) !important;
+}
+*/
+/* Button Modernization */
+.btn {
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1.25rem;
+    transition: all 0.2s ease;
 }
 
-.bfl-toggle-search-btn {
-    background: transparent;
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Form Styling */
+.form-control, .form-select {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: #475569;
+}
+
+/* Table Styling */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.table thead th {
     border: none;
-    color: #6b7280;
-    padding: 4px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    transition: background-color 0.2s;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: #64748b;
+    padding: 1rem;
 }
 
-.bfl-toggle-search-btn:hover {
-    background-color: rgba(0,0,0,0.05);
-    color: #111827;
+.table tbody tr {
+    background-color: white;
+    box-shadow: var(--card-shadow);
+    border-radius: 1rem;
+    transition: transform 0.15s ease;
 }
+
+.table tbody tr:hover {
+    transform: scale(1.005);
+    background-color: #fff;
+}
+
+.table tbody td {
+    border: none;
+    padding: 1.25rem 1rem;
+}
+
+.table tbody td:first-child {
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+}
+
+.table tbody td:last-child {
+    border-top-right-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
+/* Badge Styling */
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 600;
+    border-radius: 0.5rem;
+}
+
+/* Dashboard Specifics */
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    font-size: 1.5rem;
+}
+
+/* Mobile Bottom Nav Spacing */
+@media (max-width: 767.98px) {
+    body {
+        padding-bottom: 70px;
+    }
+}
+
+/* Legacy .bfl- classes mapping (if needed for transition) */
+.bfl-page { min-height: 100vh; }
+.bfl-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: var(--card-shadow); margin-bottom: 1rem; }
+.bfl-text-green { color: var(--primary-color); }
+.bfl-unit { font-size: 0.8em; margin-left: 2px; color: #64748b; }
