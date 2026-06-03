@@ -17,46 +17,48 @@ namespace Bike.Controllers
         private readonly string _appId;
         private readonly string _statsDataId;
 
-        public FuelLogsController(BikeDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public FuelLogsController(
+            BikeDbContext context,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
             _appId = configuration["EStat:AppId"] ?? "";
-            _statsDataId = configuration["EStat:StatsDataId"] ?? "0003421913"; // 小売物価統計調査 (Regular Gasoline)
+            _statsDataId = configuration["EStat:StatsDataId"] ?? "0003421913";
         }
 
-        // 一覧
+        // =========================
+        // LIST
+        // =========================
         public IActionResult Index(DateTime? startDate, DateTime? endDate)
         {
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
             var query = _context.FuelLogs.Where(x => x.UserId == userId);
+
             bool isSearchActive = startDate.HasValue || endDate.HasValue;
 
             if (startDate.HasValue)
             {
-                var startUtc = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
-                query = query.Where(x => x.FuelDate >= startUtc);
+                var start = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+                query = query.Where(x => x.FuelDate >= start);
             }
 
             if (endDate.HasValue)
             {
-                var endUtc = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
-                query = query.Where(x => x.FuelDate <= endUtc);
+                var end = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+                query = query.Where(x => x.FuelDate <= end);
             }
 
-            // 検索条件がない場合は最新の10件を表示する
             if (!isSearchActive)
-            {
-                query = query.Take(10);
-            }
+                query = query.OrderByDescending(x => x.FuelDate).Take(10);
+            else
+                query = query.OrderByDescending(x => x.FuelDate);
 
-            var logs = query
-                .OrderByDescending(x => x.FuelDate)
-                .ToList();
+            var logs = query.ToList();
 
-            // 検索結果の集計
             ViewBag.SearchTotalFuel = logs.Sum(x => x.FuelLiter);
             ViewBag.SearchTotalDistance = logs.Sum(x => x.DistanceKm);
             ViewBag.SearchTotalJPY = logs.Where(x => x.Currency == "JPY").Sum(x => x.Cost ?? 0);
@@ -69,72 +71,73 @@ namespace Bike.Controllers
             return View(logs);
         }
 
-        // Dashboard
+        // =========================
+        // DASHBOARD
+        // =========================
         public IActionResult Dashboard()
         {
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            var selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
 
             var allLogs = _context.FuelLogs
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
 
-            var logs = allLogs.Where(x => x.Currency == selectedCurrency).ToList();
+            var logs = allLogs
+                .Where(x => x.Currency == selectedCurrency || x.Currency == null)
+                .ToList();
 
-            double averageFuelEfficiency = logs.Any()
+            ViewBag.AverageFuelEfficiency = logs.Any()
                 ? logs.Average(x => x.FuelEfficiency)
                 : 0;
 
-            double monthlyFuelCost = logs
-                .Where(x => x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
+            var now = DateTime.Now;
+
+            ViewBag.MonthlyFuelCost = logs
+                .Where(x => x.FuelDate.Year == now.Year && x.FuelDate.Month == now.Month)
                 .Sum(x => x.Cost ?? 0);
 
-            double totalFuel = logs.Sum(x => x.FuelLiter);
-            double totalDistance = logs.Sum(x => x.DistanceKm);
-            double latestEfficiency = logs.FirstOrDefault()?.FuelEfficiency ?? 0;
-
-            ViewBag.AverageFuelEfficiency = averageFuelEfficiency;
-            ViewBag.MonthlyFuelCost = monthlyFuelCost;
-            ViewBag.TotalFuel = totalFuel;
-            ViewBag.TotalDistance = totalDistance;
-            ViewBag.LatestEfficiency = latestEfficiency;
+            ViewBag.TotalFuel = logs.Sum(x => x.FuelLiter);
+            ViewBag.TotalDistance = logs.Sum(x => x.DistanceKm);
+            ViewBag.LatestEfficiency = logs.FirstOrDefault()?.FuelEfficiency ?? 0;
 
             return View(allLogs);
         }
 
-        // Monthly（画面枠）
+        // =========================
+        // MONTHLY
+        // =========================
         public IActionResult Monthly()
         {
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            var selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            var now = DateTime.Now;
 
             var logs = _context.FuelLogs
-                .Where(x => x.UserId == userId && 
-                            x.FuelDate.Year == DateTime.UtcNow.Year && 
-                            x.FuelDate.Month == DateTime.UtcNow.Month &&
-                            x.Currency == selectedCurrency)
+                .Where(x =>
+                    x.UserId == userId &&
+                    x.FuelDate.Year == now.Year &&
+                    x.FuelDate.Month == now.Month &&
+                    x.Currency == selectedCurrency)
                 .ToList();
 
-            double totalFuel = logs.Sum(x => x.FuelLiter);
-            double totalDistance = logs.Sum(x => x.DistanceKm);
-            double totalCost = logs.Sum(x => x.Cost ?? 0);
-            double averageEfficiency = totalFuel > 0 ? totalDistance / totalFuel : 0;
-
-            ViewBag.TotalFuel = totalFuel;
-            ViewBag.TotalDistance = totalDistance;
-            ViewBag.TotalCost = totalCost;
-            ViewBag.AverageEfficiency = averageEfficiency;
-            ViewBag.MonthYear = DateTime.UtcNow.ToString("MMMM yyyy");
+            ViewBag.TotalFuel = logs.Sum(x => x.FuelLiter);
+            ViewBag.TotalDistance = logs.Sum(x => x.DistanceKm);
+            ViewBag.TotalCost = logs.Sum(x => x.Cost ?? 0);
+            ViewBag.AverageEfficiency = logs.Any() ? logs.Sum(x => x.DistanceKm) / logs.Sum(x => x.FuelLiter) : 0;
+            ViewBag.MonthYear = now.ToString("MMMM yyyy");
 
             return View();
         }
 
-        // 追加画面
+        // =========================
+        // CREATE (GET)
+        // =========================
         public IActionResult Create()
         {
             var userId = HttpContext.Session.GetInt32("userId");
@@ -146,141 +149,108 @@ namespace Bike.Controllers
             });
         }
 
-        // 保存
+        // =========================
+        // CREATE (POST)
+        // =========================
         [HttpPost]
         public async Task<IActionResult> Create(FuelLog log, string Region, double? Latitude, double? Longitude)
         {
-<<<<<<< Updated upstream
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-
-=======
-
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
-
->>>>>>> Stashed changes
             if (log == null)
-            {
-                return BadRequest("Invalid data submitted.");
-            }
-<<<<<<< Updated upstream
-=======
+                return BadRequest("Invalid data");
 
->>>>>>> Stashed changes
             log.UserId = userId.Value;
 
-            // --- 自動計算ロジック (ベトナム・日本特化) ---
-            const double PRICE_VN = 23000.0; // 1L = 23,000 VND
+            Region = (Region ?? "VN").ToUpper();
+
+            const double PRICE_VN = 23000.0;
 
             if (Region == "JP")
             {
-                double priceJp = await GetJapanGasPriceAsync();
+                var priceJp = await GetJapanGasPriceAsync();
                 log.Currency = "JPY";
-                log.FuelLiter = (log.Cost ?? 0) / priceJp;
+
+                // cost -> liter (参考値として保持)
+                if (priceJp > 0)
+                    log.FuelLiter = (log.Cost ?? 0) / priceJp;
             }
-            else // Default to VN
+            else
             {
                 log.Currency = "VND";
                 log.FuelLiter = (log.Cost ?? 0) / PRICE_VN;
             }
 
-            // --- 走行距離（Distance km）の自動計算の準備 ---
-            double currentLat = Latitude ?? 0;
-            double currentLng = Longitude ?? 0;
-
-            // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
-            log.DistanceKm = 0; 
-
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
-            // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
-            if (log.UserId == 0)
-            {
-                log.UserId = 1;
-            }
-
-<<<<<<< Updated upstream
-            // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
-=======
->>>>>>> Stashed changes
-
+            log.DistanceKm = 0; // TODO: Maps API
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;
 
             _context.FuelLogs.Add(log);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Dashboard");
         }
 
+        // =========================
+        // JAPAN PRICE API
+        // =========================
         private async Task<double> GetJapanGasPriceAsync()
         {
             try
             {
-                // e-Stat API: 小売物価統計調査 (Regular Gasoline in Tokyo as proxy)
-                // cdCat01=07301 (Gasoline), cdArea=13101 (Tokyo)
-                string url = $"https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData?appId={_appId}&statsDataId={_statsDataId}&cdCat01=07301&cdArea=13101";
-                
-                var response = await _httpClient.GetAsync(url);
-                if (response.IsSuccessStatusCode)
+                string url =
+                    $"https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData" +
+                    $"?appId={_appId}&statsDataId={_statsDataId}&cdCat01=07301&cdArea=13101";
+
+                var res = await _httpClient.GetAsync(url);
+
+                if (!res.IsSuccessStatusCode)
+                    return 170.0;
+
+                var json = await res.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("GET_STATS_DATA", out var g) &&
+                    g.TryGetProperty("STATISTICAL_DATA", out var s) &&
+                    s.TryGetProperty("DATA_INF", out var d) &&
+                    d.TryGetProperty("VALUE", out var v))
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    using var doc = JsonDocument.Parse(content);
-                    var root = doc.RootElement;
+                    var latest = v.ValueKind == JsonValueKind.Array
+                        ? v.EnumerateArray().LastOrDefault()
+                        : v;
 
-                    if (root.TryGetProperty("GET_STATS_DATA", out var getData) &&
-                        getData.TryGetProperty("STATISTICAL_DATA", out var statData) &&
-                        statData.TryGetProperty("DATA_INF", out var dataInf) &&
-                        dataInf.TryGetProperty("VALUE", out var values))
-                    {
-                        JsonElement latestEntry;
-                        if (values.ValueKind == JsonValueKind.Array)
-                        {
-                            latestEntry = values.EnumerateArray().LastOrDefault();
-                        }
-                        else
-                        {
-                            latestEntry = values;
-                        }
-
-                        if (latestEntry.TryGetProperty("$", out var priceVal))
-                        {
-                            if (double.TryParse(priceVal.GetString(), out double price))
-                            {
-                                return price;
-                            }
-                        }
-                    }
+                    if (latest.TryGetProperty("$", out var price))
+                        if (double.TryParse(price.GetString(), out var p))
+                            return p;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error fetching Japan gas price: {ex.Message}");
+                // ignore
             }
 
-            return 170.0; // Fallback value
+            return 170.0;
         }
 
-        // 編集画面
+        // =========================
+        // EDIT
+        // =========================
         public IActionResult Edit(int id)
         {
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
             var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id && x.UserId == userId);
-            if (log is null)
-            {
+
+            if (log == null)
                 return NotFound();
-            }
 
             return View(log);
         }
 
-        // 更新
         [HttpPost]
         public IActionResult Edit(FuelLog log)
         {
@@ -288,23 +258,26 @@ namespace Bike.Controllers
             if (userId == null) return RedirectToAction("Login", "Account");
 
             var existing = _context.FuelLogs.FirstOrDefault(x => x.Id == log.Id && x.UserId == userId);
-            if (existing is null)
-            {
+
+            if (existing == null)
                 return NotFound();
-            }
 
             existing.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             existing.FuelLiter = log.FuelLiter;
             existing.DistanceKm = log.DistanceKm;
             existing.Cost = log.Cost;
-            string sessionCurrency = HttpContext.Session.GetString("currency") ?? "USD";
-            existing.Currency = string.IsNullOrWhiteSpace(log.Currency) ? existing.Currency ?? sessionCurrency : log.Currency;
+
+            var sessionCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            existing.Currency = log.Currency ?? sessionCurrency;
 
             _context.SaveChanges();
+
             return RedirectToAction("Index");
         }
 
-        // 削除
+        // =========================
+        // DELETE
+        // =========================
         [HttpPost]
         public IActionResult Delete(int id)
         {
@@ -312,13 +285,13 @@ namespace Bike.Controllers
             if (userId == null) return RedirectToAction("Login", "Account");
 
             var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id && x.UserId == userId);
-            if (log is null)
-            {
+
+            if (log == null)
                 return NotFound();
-            }
 
             _context.FuelLogs.Remove(log);
             _context.SaveChanges();
+
             return RedirectToAction("Index");
         }
     }
