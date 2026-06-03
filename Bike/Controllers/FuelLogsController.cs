@@ -56,6 +56,12 @@ namespace Bike.Controllers
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
 
+            // 検索結果の集計
+            ViewBag.SearchTotalFuel = logs.Sum(x => x.FuelLiter);
+            ViewBag.SearchTotalDistance = logs.Sum(x => x.DistanceKm);
+            ViewBag.SearchTotalJPY = logs.Where(x => x.Currency == "JPY").Sum(x => x.Cost ?? 0);
+            ViewBag.SearchTotalVND = logs.Where(x => x.Currency == "VND").Sum(x => x.Cost ?? 0);
+
             ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
             ViewBag.IsSearchActive = isSearchActive;
@@ -69,10 +75,14 @@ namespace Bike.Controllers
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            var logs = _context.FuelLogs
+            string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+
+            var allLogs = _context.FuelLogs
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.FuelDate)
                 .ToList();
+
+            var logs = allLogs.Where(x => x.Currency == selectedCurrency).ToList();
 
             double averageFuelEfficiency = logs.Any()
                 ? logs.Average(x => x.FuelEfficiency)
@@ -92,7 +102,7 @@ namespace Bike.Controllers
             ViewBag.TotalDistance = totalDistance;
             ViewBag.LatestEfficiency = latestEfficiency;
 
-            return View(logs);
+            return View(allLogs);
         }
 
         // Monthly（画面枠）
@@ -101,8 +111,13 @@ namespace Bike.Controllers
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
+            string selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+
             var logs = _context.FuelLogs
-                .Where(x => x.UserId == userId && x.FuelDate.Year == DateTime.UtcNow.Year && x.FuelDate.Month == DateTime.UtcNow.Month)
+                .Where(x => x.UserId == userId && 
+                            x.FuelDate.Year == DateTime.UtcNow.Year && 
+                            x.FuelDate.Month == DateTime.UtcNow.Month &&
+                            x.Currency == selectedCurrency)
                 .ToList();
 
             double totalFuel = logs.Sum(x => x.FuelLiter);
@@ -135,18 +150,14 @@ namespace Bike.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(FuelLog log, string Region, double? Latitude, double? Longitude)
         {
-<<<<<<< Updated upstream
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
-=======
->>>>>>> Stashed changes
+
             if (log == null)
             {
                 return BadRequest("Invalid data submitted.");
             }
-
-<<<<<<< Updated upstream
             log.UserId = userId.Value;
 
             // --- 自動計算ロジック (ベトナム・日本特化) ---
@@ -171,7 +182,7 @@ namespace Bike.Controllers
             // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
             log.DistanceKm = 0; 
 
-=======
+
             // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
             if (log.UserId == 0)
             {
@@ -179,7 +190,7 @@ namespace Bike.Controllers
             }
 
             // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
->>>>>>> Stashed changes
+
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;
 
