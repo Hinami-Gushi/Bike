@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Bike.Data;
 using Bike.Models;
@@ -24,49 +25,97 @@ namespace Bike.Controllers
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
-            _appId = configuration["EStat:AppId"] ?? "";
-            _statsDataId = configuration["EStat:StatsDataId"] ?? "0003421913";
+
+            _appId =
+                configuration["EStat:AppId"] ?? "";
+
+            _statsDataId =
+                configuration["EStat:StatsDataId"]
+                ?? "0003421913";
         }
 
         // =========================
-        // LIST
+        // INDEX
         // =========================
-        public IActionResult Index(DateTime? startDate, DateTime? endDate)
+        public IActionResult Index(
+            DateTime? startDate,
+            DateTime? endDate)
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
 
-            var query = _context.FuelLogs.Where(x => x.UserId == userId);
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
 
-            bool isSearchActive = startDate.HasValue || endDate.HasValue;
+            var query = _context.FuelLogs
+                .Where(x => x.UserId == userId);
+
+            bool isSearchActive =
+                startDate.HasValue ||
+                endDate.HasValue;
 
             if (startDate.HasValue)
             {
-                var start = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
-                query = query.Where(x => x.FuelDate >= start);
+                var start =
+                    DateTime.SpecifyKind(
+                        startDate.Value,
+                        DateTimeKind.Utc);
+
+                query =
+                    query.Where(
+                        x => x.FuelDate >= start);
             }
 
             if (endDate.HasValue)
             {
-                var end = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
-                query = query.Where(x => x.FuelDate <= end);
+                var end =
+                    DateTime.SpecifyKind(
+                        endDate.Value,
+                        DateTimeKind.Utc);
+
+                query =
+                    query.Where(
+                        x => x.FuelDate <= end);
             }
 
             if (!isSearchActive)
-                query = query.OrderByDescending(x => x.FuelDate).Take(10);
+            {
+                query = query
+                    .OrderByDescending(x => x.FuelDate)
+                    .Take(10);
+            }
             else
-                query = query.OrderByDescending(x => x.FuelDate);
+            {
+                query = query
+                    .OrderByDescending(x => x.FuelDate);
+            }
 
             var logs = query.ToList();
 
-            ViewBag.SearchTotalFuel = logs.Sum(x => x.FuelLiter);
-            ViewBag.SearchTotalDistance = logs.Sum(x => x.DistanceKm);
-            ViewBag.SearchTotalJPY = logs.Where(x => x.Currency == "JPY").Sum(x => x.Cost ?? 0);
-            ViewBag.SearchTotalVND = logs.Where(x => x.Currency == "VND").Sum(x => x.Cost ?? 0);
+            ViewBag.SearchTotalFuel =
+                logs.Sum(x => x.FuelLiter);
 
-            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
-            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
-            ViewBag.IsSearchActive = isSearchActive;
+            ViewBag.SearchTotalDistance =
+                logs.Sum(x => x.DistanceKm);
+
+            ViewBag.SearchTotalJPY =
+                logs.Where(x => x.Currency == "JPY")
+                    .Sum(x => x.Cost ?? 0);
+
+            ViewBag.SearchTotalVND =
+                logs.Where(x => x.Currency == "VND")
+                    .Sum(x => x.Cost ?? 0);
+
+            ViewBag.StartDate =
+                startDate?.ToString("yyyy-MM-dd");
+
+            ViewBag.EndDate =
+                endDate?.ToString("yyyy-MM-dd");
+
+            ViewBag.IsSearchActive =
+                isSearchActive;
 
             return View(logs);
         }
@@ -76,10 +125,17 @@ namespace Bike.Controllers
         // =========================
         public IActionResult Dashboard()
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
 
-            var selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+
+            var selectedCurrency =
+                HttpContext.Session.GetString("currency")
+                ?? "USD";
 
             var allLogs = _context.FuelLogs
                 .Where(x => x.UserId == userId)
@@ -87,22 +143,45 @@ namespace Bike.Controllers
                 .ToList();
 
             var logs = allLogs
-                .Where(x => x.Currency == selectedCurrency || x.Currency == null)
+                .Where(x =>
+                    x.Currency == selectedCurrency ||
+                    x.Currency == null)
                 .ToList();
 
-            ViewBag.AverageFuelEfficiency = logs.Any()
-                ? logs.Average(x => x.FuelEfficiency)
-                : 0;
+            double totalFuel =
+                logs.Sum(x => x.FuelLiter);
+
+            double totalDistance =
+                logs.Sum(x => x.DistanceKm);
+
+            double averageFuelEfficiency =
+                totalFuel > 0
+                    ? totalDistance / totalFuel
+                    : 0;
 
             var now = DateTime.Now;
 
-            ViewBag.MonthlyFuelCost = logs
-                .Where(x => x.FuelDate.Year == now.Year && x.FuelDate.Month == now.Month)
+            double monthlyFuelCost = logs
+                .Where(x =>
+                    x.FuelDate.Year == now.Year &&
+                    x.FuelDate.Month == now.Month)
                 .Sum(x => x.Cost ?? 0);
 
-            ViewBag.TotalFuel = logs.Sum(x => x.FuelLiter);
-            ViewBag.TotalDistance = logs.Sum(x => x.DistanceKm);
-            ViewBag.LatestEfficiency = logs.FirstOrDefault()?.FuelEfficiency ?? 0;
+            ViewBag.AverageFuelEfficiency =
+                averageFuelEfficiency;
+
+            ViewBag.MonthlyFuelCost =
+                monthlyFuelCost;
+
+            ViewBag.TotalFuel =
+                totalFuel;
+
+            ViewBag.TotalDistance =
+                totalDistance;
+
+            ViewBag.LatestEfficiency =
+                logs.FirstOrDefault()?.FuelEfficiency
+                ?? 0;
 
             return View(allLogs);
         }
@@ -112,88 +191,168 @@ namespace Bike.Controllers
         // =========================
         public IActionResult Monthly()
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
 
-            var selectedCurrency = HttpContext.Session.GetString("currency") ?? "USD";
-            var now = DateTime.Now;
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+
+            var selectedCurrency =
+                HttpContext.Session.GetString("currency")
+                ?? "USD";
+
+            var fourMonthsAgo =
+                DateTime.UtcNow.AddMonths(-3);
+
+            var startDate = new DateTime(
+                fourMonthsAgo.Year,
+                fourMonthsAgo.Month,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc);
 
             var logs = _context.FuelLogs
                 .Where(x =>
                     x.UserId == userId &&
-                    x.FuelDate.Year == now.Year &&
-                    x.FuelDate.Month == now.Month &&
+                    x.FuelDate >= startDate &&
                     x.Currency == selectedCurrency)
                 .ToList();
 
-            ViewBag.TotalFuel = logs.Sum(x => x.FuelLiter);
-            ViewBag.TotalDistance = logs.Sum(x => x.DistanceKm);
-            ViewBag.TotalCost = logs.Sum(x => x.Cost ?? 0);
-            ViewBag.AverageEfficiency = logs.Any() ? logs.Sum(x => x.DistanceKm) / logs.Sum(x => x.FuelLiter) : 0;
-            ViewBag.MonthYear = now.ToString("MMMM yyyy");
+            var monthlySummaries = logs
+                .GroupBy(x => new
+                {
+                    x.FuelDate.Year,
+                    x.FuelDate.Month
+                })
+                .Select(g => new
+                {
+                    MonthYear = new DateTime(
+                        g.Key.Year,
+                        g.Key.Month,
+                        1).ToString("MMMM yyyy"),
+
+                    Year = g.Key.Year,
+
+                    Month = g.Key.Month,
+
+                    TotalFuel =
+                        g.Sum(x => x.FuelLiter),
+
+                    TotalDistance =
+                        g.Sum(x => x.DistanceKm),
+
+                    TotalCost =
+                        g.Sum(x => x.Cost ?? 0),
+
+                    AverageEfficiency =
+                        g.Sum(x => x.FuelLiter) > 0
+                            ? g.Sum(x => x.DistanceKm)
+                                / g.Sum(x => x.FuelLiter)
+                            : 0
+                })
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Month)
+                .ToList();
+
+            ViewBag.MonthlySummaries =
+                monthlySummaries;
 
             return View();
         }
 
         // =========================
-        // CREATE (GET)
+        // CREATE GET
         // =========================
         public IActionResult Create()
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
+
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
 
             return View(new FuelLog
             {
-                FuelDate = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc)
+                FuelDate = DateTime.SpecifyKind(
+                    DateTime.Today,
+                    DateTimeKind.Utc)
             });
         }
 
         // =========================
-        // CREATE (POST)
+        // CREATE POST
         // =========================
         [HttpPost]
-        public async Task<IActionResult> Create(FuelLog log, string Region, double? Latitude, double? Longitude)
+        public async Task<IActionResult> Create(
+            FuelLog log,
+            string Region,
+            double? Latitude,
+            double? Longitude)
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
+
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
 
             if (log == null)
                 return BadRequest("Invalid data");
 
             log.UserId = userId.Value;
 
-            Region = (Region ?? "VN").ToUpper();
+            Region =
+                (Region ?? "VN").ToUpper();
 
             const double PRICE_VN = 23000.0;
 
             if (Region == "JP")
             {
-                var priceJp = await GetJapanGasPriceAsync();
+                var priceJp =
+                    await GetJapanGasPriceAsync();
+
                 log.Currency = "JPY";
 
-                // cost -> liter (参考値として保持)
                 if (priceJp > 0)
-                    log.FuelLiter = (log.Cost ?? 0) / priceJp;
+                {
+                    log.FuelLiter =
+                        (log.Cost ?? 0) / priceJp;
+                }
             }
             else
             {
                 log.Currency = "VND";
-                log.FuelLiter = (log.Cost ?? 0) / PRICE_VN;
+
+                log.FuelLiter =
+                    (log.Cost ?? 0) / PRICE_VN;
             }
 
-            log.DistanceKm = 0; // TODO: Maps API
-            log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
-            log.CreatedAt = DateTime.UtcNow;
+            log.DistanceKm = 0;
+
+            log.FuelDate =
+                DateTime.SpecifyKind(
+                    log.FuelDate,
+                    DateTimeKind.Utc);
+
+            log.CreatedAt =
+                DateTime.UtcNow;
 
             _context.FuelLogs.Add(log);
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Dashboard");
         }
 
         // =========================
-        // JAPAN PRICE API
+        // JAPAN GAS API
         // =========================
         private async Task<double> GetJapanGasPriceAsync()
         {
@@ -201,49 +360,84 @@ namespace Bike.Controllers
             {
                 string url =
                     $"https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData" +
-                    $"?appId={_appId}&statsDataId={_statsDataId}&cdCat01=07301&cdArea=13101";
+                    $"?appId={_appId}" +
+                    $"&statsDataId={_statsDataId}" +
+                    $"&cdCat01=07301&cdArea=13101";
 
-                var res = await _httpClient.GetAsync(url);
+                var res =
+                    await _httpClient.GetAsync(url);
 
                 if (!res.IsSuccessStatusCode)
                     return 170.0;
 
-                var json = await res.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(json);
+                var json =
+                    await res.Content.ReadAsStringAsync();
 
-                var root = doc.RootElement;
+                using var doc =
+                    JsonDocument.Parse(json);
 
-                if (root.TryGetProperty("GET_STATS_DATA", out var g) &&
-                    g.TryGetProperty("STATISTICAL_DATA", out var s) &&
-                    s.TryGetProperty("DATA_INF", out var d) &&
-                    d.TryGetProperty("VALUE", out var v))
+                var root =
+                    doc.RootElement;
+
+                if (root.TryGetProperty(
+                        "GET_STATS_DATA",
+                        out var g)
+                    &&
+                    g.TryGetProperty(
+                        "STATISTICAL_DATA",
+                        out var s)
+                    &&
+                    s.TryGetProperty(
+                        "DATA_INF",
+                        out var d)
+                    &&
+                    d.TryGetProperty(
+                        "VALUE",
+                        out var v))
                 {
-                    var latest = v.ValueKind == JsonValueKind.Array
-                        ? v.EnumerateArray().LastOrDefault()
-                        : v;
+                    var latest =
+                        v.ValueKind == JsonValueKind.Array
+                            ? v.EnumerateArray()
+                                .LastOrDefault()
+                            : v;
 
-                    if (latest.TryGetProperty("$", out var price))
-                        if (double.TryParse(price.GetString(), out var p))
+                    if (latest.TryGetProperty(
+                            "$",
+                            out var price))
+                    {
+                        if (double.TryParse(
+                                price.GetString(),
+                                out var p))
+                        {
                             return p;
+                        }
+                    }
                 }
             }
             catch
             {
-                // ignore
             }
 
             return 170.0;
         }
 
         // =========================
-        // EDIT
+        // EDIT GET
         // =========================
         public IActionResult Edit(int id)
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
 
-            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+
+            var log = _context.FuelLogs
+                .FirstOrDefault(x =>
+                    x.Id == id &&
+                    x.UserId == userId);
 
             if (log == null)
                 return NotFound();
@@ -251,24 +445,48 @@ namespace Bike.Controllers
             return View(log);
         }
 
+        // =========================
+        // EDIT POST
+        // =========================
         [HttpPost]
         public IActionResult Edit(FuelLog log)
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
 
-            var existing = _context.FuelLogs.FirstOrDefault(x => x.Id == log.Id && x.UserId == userId);
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+
+            var existing = _context.FuelLogs
+                .FirstOrDefault(x =>
+                    x.Id == log.Id &&
+                    x.UserId == userId);
 
             if (existing == null)
                 return NotFound();
 
-            existing.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
-            existing.FuelLiter = log.FuelLiter;
-            existing.DistanceKm = log.DistanceKm;
-            existing.Cost = log.Cost;
+            existing.FuelDate =
+                DateTime.SpecifyKind(
+                    log.FuelDate,
+                    DateTimeKind.Utc);
 
-            var sessionCurrency = HttpContext.Session.GetString("currency") ?? "USD";
-            existing.Currency = log.Currency ?? sessionCurrency;
+            existing.FuelLiter =
+                log.FuelLiter;
+
+            existing.DistanceKm =
+                log.DistanceKm;
+
+            existing.Cost =
+                log.Cost;
+
+            var sessionCurrency =
+                HttpContext.Session.GetString("currency")
+                ?? "USD";
+
+            existing.Currency =
+                log.Currency ?? sessionCurrency;
 
             _context.SaveChanges();
 
@@ -281,15 +499,24 @@ namespace Bike.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
+            var userId =
+                HttpContext.Session.GetInt32("userId");
 
-            var log = _context.FuelLogs.FirstOrDefault(x => x.Id == id && x.UserId == userId);
+            if (userId == null)
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+
+            var log = _context.FuelLogs
+                .FirstOrDefault(x =>
+                    x.Id == id &&
+                    x.UserId == userId);
 
             if (log == null)
                 return NotFound();
 
             _context.FuelLogs.Remove(log);
+
             _context.SaveChanges();
 
             return RedirectToAction("Index");

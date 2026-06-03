@@ -16,7 +16,6 @@ namespace Bike.Helpers
                 ["TotalFuel"] = "TOTAL FUEL",
                 ["ThisMonthCost"] = "THIS MONTH COST",
                 ["TotalDistance"] = "TOTAL DISTANCE",
-                ["LatestEfficiency"] = "LATEST EFFICIENCY",
                 ["AddFuelLog"] = "Add Fuel Log",
                 ["Date"] = "Date",
                 ["FuelLiters"] = "Fuel (L)",
@@ -28,13 +27,12 @@ namespace Bike.Helpers
                 ["Record"] = "record",
                 ["MonthlyCost"] = "Monthly Cost",
                 ["OneMonth"] = "1 month",
-                ["Fuel"] = "fuel",
-                ["Distance"] = "distance",
-                ["Efficiency"] = "efficiency",
-                ["DeleteConfirm"] = "Are you sure you want to delete?"
-            },
-            ["ja"] = new()
-            {
+                ["MonthCost"] = "THIS MONTH COST",
+                ["TotalDistance"] = "TOTAL DISTANCE",
+                ["AddFuelLog"] = "＋ Add Fuel Log"
+                },
+                ["ja"] = new()
+                {
                 ["Dashboard"] = "ダッシュボード",
                 ["Add"] = "追加",
                 ["History"] = "履歴",
@@ -43,7 +41,6 @@ namespace Bike.Helpers
                 ["TotalFuel"] = "合計燃料",
                 ["ThisMonthCost"] = "今月の費用",
                 ["TotalDistance"] = "合計距離",
-                ["LatestEfficiency"] = "直近の燃費",
                 ["AddFuelLog"] = "給油記録を追加",
                 ["Date"] = "日付",
                 ["FuelLiters"] = "燃料 (L)",
@@ -59,9 +56,9 @@ namespace Bike.Helpers
                 ["Distance"] = "距離",
                 ["Efficiency"] = "燃費",
                 ["DeleteConfirm"] = "本当に削除しますか？"
-            },
-            ["vi"] = new()
-            {
+                },
+                ["vi"] = new()
+                {
                 ["Dashboard"] = "Bảng điều khiển",
                 ["Add"] = "Thêm mới",
                 ["History"] = "Lịch sử",
@@ -70,7 +67,6 @@ namespace Bike.Helpers
                 ["TotalFuel"] = "TỔNG NHIÊN LIỆU",
                 ["ThisMonthCost"] = "CHI PHÍ THÁNG NÀY",
                 ["TotalDistance"] = "TỔNG QUÃNG ĐƯỜNG",
-                ["LatestEfficiency"] = "HIỆU SUẤT MỚI NHẤT",
                 ["AddFuelLog"] = "Thêm nhật ký nhiên liệu",
                 ["Date"] = "Ngày",
                 ["FuelLiters"] = "Nhiên liệu (L)",
