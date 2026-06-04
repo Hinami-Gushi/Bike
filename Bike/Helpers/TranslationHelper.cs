@@ -32,7 +32,8 @@ namespace Bike.Helpers
                 ["OneMonth"] = "1 month",
                 ["MonthCost"] = "THIS MONTH COST",
                 ["TotalDistance"] = "TOTAL DISTANCE",
-                ["AddFuelLog"] = "＋ Add Fuel Log"
+                ["AddFuelLog"] = "＋ Add Fuel Log",
+                ["Summary"] = "Summary"
                 },
                 ["ja"] = new()
                 {
@@ -59,6 +60,7 @@ namespace Bike.Helpers
                 ["Fuel"] = "燃料",
                 ["Distance"] = "距離",
                 ["Efficiency"] = "燃費",
+                ["Summary"] = "サマリー",
                 ["DeleteConfirm"] = "本当に削除しますか？"
                 },
                 ["vi"] = new()
@@ -86,6 +88,7 @@ namespace Bike.Helpers
                 ["Fuel"] = "nhiên liệu",
                 ["Distance"] = "khoảng cách",
                 ["Efficiency"] = "hiệu suất",
+                ["Summary"] = "Tóm tắt",
                 ["DeleteConfirm"] = "Bạn có thực sự muốn xóa không?"
             }
         };

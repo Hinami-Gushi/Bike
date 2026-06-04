@@ -128,8 +128,8 @@ namespace Bike.Controllers
                 .Select(g => new
                 {
                     MonthYear = lang == "ja" 
-                        ? $"{g.Key.Year}年{g.Key.Month}月" 
-                        : $"{g.Key.Year}/{g.Key.Month:D2}",
+                        ? $"{g.Key.Month}月 {g.Key.Year}" 
+                        : $"{g.Key.Year}/{g.Key.Month}",
                     Year = g.Key.Year,
                     Month = g.Key.Month,
                     TotalFuel = g.Sum(x => x.FuelLiter),
