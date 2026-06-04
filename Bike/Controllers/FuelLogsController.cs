@@ -116,16 +116,20 @@ namespace Bike.Controllers
             var startDate = new DateTime(fourMonthsAgo.Year, fourMonthsAgo.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
             var logs = _context.FuelLogs
-                .Where(x => x.UserId == userId && 
+                .Where(x => x.UserId == userId &&
                             x.FuelDate >= startDate &&
                             x.Currency == selectedCurrency)
                 .ToList();
 
+            string lang = HttpContext.Session.GetString("lang") ?? "en";
+
             var monthlySummaries = logs
                 .GroupBy(x => new { x.FuelDate.Year, x.FuelDate.Month })
-                .Select(g => new 
+                .Select(g => new
                 {
-                    MonthYear = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM yyyy"),
+                    MonthYear = lang == "ja" 
+                        ? $"{g.Key.Year}年{g.Key.Month}月" 
+                        : $"{g.Key.Year}/{g.Key.Month:D2}",
                     Year = g.Key.Year,
                     Month = g.Key.Month,
                     TotalFuel = g.Sum(x => x.FuelLiter),
@@ -157,35 +161,32 @@ namespace Bike.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(FuelLog log, string Region, double? Latitude, double? Longitude)
         {
-<<<<<<< Updated upstream
             var userId = HttpContext.Session.GetInt32("userId");
             if (userId == null) return RedirectToAction("Login", "Account");
 
 
-=======
-
-            var userId = HttpContext.Session.GetInt32("userId");
-            if (userId == null) return RedirectToAction("Login", "Account");
-
->>>>>>> Stashed changes
             if (log == null)
             {
                 return BadRequest("Invalid data submitted.");
             }
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
+
             log.UserId = userId.Value;
 
-            // --- 自動計算ロジック (ベトナム・日本特化) ---
+            // --- 自動計算ロジック (ベトナム・日本・アメリカ特化) ---
             const double PRICE_VN = 23000.0; // 1L = 23,000 VND
+            const double PRICE_US = 0.95;    // 1L = 0.95 USD (approx)
 
             if (Region == "JP")
             {
                 double priceJp = await GetJapanGasPriceAsync();
                 log.Currency = "JPY";
                 log.FuelLiter = (log.Cost ?? 0) / priceJp;
+            }
+            else if (Region == "US")
+            {
+                log.Currency = "USD";
+                log.FuelLiter = (log.Cost ?? 0) / PRICE_US;
             }
             else // Default to VN
             {
@@ -200,20 +201,17 @@ namespace Bike.Controllers
             // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
             log.DistanceKm = 0; 
 
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
+
+
             // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
             if (log.UserId == 0)
             {
                 log.UserId = 1;
             }
 
-<<<<<<< Updated upstream
             // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
-=======
->>>>>>> Stashed changes
+
 
             log.FuelDate = DateTime.SpecifyKind(log.FuelDate, DateTimeKind.Utc);
             log.CreatedAt = DateTime.UtcNow;

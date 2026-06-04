@@ -112,7 +112,7 @@
                 <tr>
                     <td>
                         <div class="fw-bold text-dark">@item.FuelDate.ToString("yyyy/MM/dd")</div>
-                        <div class="text-muted small">@item.FuelDate.ToString("dddd")</div>
+                        <div class="text-muted small">@TranslationHelper.GetWeekday(item.FuelDate, lang)</div>
                     </td>
                     <td>
                         <span class="fw-medium">@item.FuelLiter.ToString("0.0")</span> <span class="text-muted small">L</span>

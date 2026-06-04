@@ -135,7 +135,7 @@
                             @foreach (var item in Model.Take(5))
                             {
                                 <tr style="box-shadow: none; border-bottom: 1px solid #f1f5f9;">
-                                    <td class="py-3 fw-medium">@item.FuelDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="py-3 fw-medium">@item.FuelDate.ToString("yyyy/MM/dd")</td>
                                     <td class="py-3">@item.FuelLiter.ToString("0.0") L</td>
                                     <td class="py-3">@item.DistanceKm.ToString("0.0") km</td>
                                     <td class="py-3">@item.Cost?.ToString("#,0") @item.Currency</td>

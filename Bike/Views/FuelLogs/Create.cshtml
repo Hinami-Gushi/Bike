@@ -10,9 +10,9 @@
     // Translations for this view
     var t = new Dictionary<string, Dictionary<string, string>>
     {
-        ["en"] = new() { ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Cost"] = "Cost", ["Save"] = "Save", ["Region"] = "Region", ["Vietnam"] = "Vietnam", ["Japan"] = "Japan" },
-        ["ja"] = new() { ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Cost"] = "金額", ["Save"] = "保存", ["Region"] = "地域", ["Vietnam"] = "ベトナム", ["Japan"] = "日本" },
-        ["vi"] = new() { ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Cost"] = "Chi phí", ["Save"] = "Lưu", ["Region"] = "Vùng", ["Vietnam"] = "Việt Nam", ["Japan"] = "Nhật Bản" }
+        ["en"] = new() { ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Cost"] = "Cost", ["Save"] = "Save", ["Region"] = "Region", ["Vietnam"] = "Vietnam", ["Japan"] = "Japan", ["USA"] = "USA" },
+        ["ja"] = new() { ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Cost"] = "金額", ["Save"] = "保存", ["Region"] = "地域", ["Vietnam"] = "ベトナム", ["Japan"] = "日本", ["USA"] = "アメリカ" },
+        ["vi"] = new() { ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Cost"] = "Chi phí", ["Save"] = "Lưu", ["Region"] = "Vùng", ["Vietnam"] = "Việt Nam", ["Japan"] = "Nhật Bản", ["USA"] = "Mỹ" }
     };
 
     var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
@@ -48,18 +48,20 @@
 
                                 <input type="radio" class="btn-check" name="region_toggle" id="btnJP" autocomplete="off" onclick="setRegion('JP')">
                                 <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnJP">🇯🇵 @currentT["Japan"]</label>
+
+                                <input type="radio" class="btn-check" name="region_toggle" id="btnUS" autocomplete="off" onclick="setRegion('US')">
+                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnUS">🇺🇸 @currentT["USA"]</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label d-flex justify-content-between" id="costLabel">
-                            <span>@currentT["Cost"] (VND)</span>
+                        <label class="form-label d-flex justify-content-end" id="costLabel">
                             <span class="text-danger small fw-bold">* Required</span>
                         </label>
                         <div class="input-group input-group-lg shadow-sm">
                             <span class="input-group-text bg-white border-end-0 text-muted" id="currencySymbol">₫</span>
-                            <input class="form-control border-start-0 ps-0" type="number" step="1" min="0" asp-for="Cost" id="CostInput" placeholder="50000" required />
+                            <input class="form-control border-start-0 ps-0" type="number" step="0.01" min="0" asp-for="Cost" id="CostInput" placeholder="50000" required />
                         </div>
                         
                         <!-- Quick Buttons -->
@@ -74,6 +76,13 @@
                             <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(1000)">1,000 円</button>
                             <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(3000)">3,000 円</button>
                             <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(5000)">5,000 円</button>
+                        </div>
+
+                        <div class="mt-3 d-flex flex-wrap gap-2 d-none" id="quickUS">
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(10)">$ 10.00</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(20)">$ 20.00</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(30)">$ 30.00</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(40)">$ 40.00</button>
                         </div>
                     </div>
 
@@ -104,22 +113,30 @@
             document.getElementById('Region').value = region;
             const quickVN = document.getElementById('quickVN');
             const quickJP = document.getElementById('quickJP');
-            const costLabel = document.getElementById('costLabel');
+            const quickUS = document.getElementById('quickUS');
             const costInput = document.getElementById('CostInput');
             const currencySymbol = document.getElementById('currencySymbol');
 
+            // Hide all quick buttons
+            quickVN.classList.add('d-none');
+            quickJP.classList.add('d-none');
+            quickUS.classList.add('d-none');
+
             if (region === 'VN') {
                 quickVN.classList.remove('d-none');
-                quickJP.classList.add('d-none');
-                costLabel.querySelector('span:first-child').innerText = '@currentT["Cost"] (VND)';
                 costInput.placeholder = "50000";
+                costInput.step = "1";
                 currencySymbol.innerText = "₫";
-            } else {
+            } else if (region === 'JP') {
                 quickJP.classList.remove('d-none');
-                quickVN.classList.add('d-none');
-                costLabel.querySelector('span:first-child').innerText = '@currentT["Cost"] (JPY)';
                 costInput.placeholder = "3000";
+                costInput.step = "1";
                 currencySymbol.innerText = "¥";
+            } else if (region === 'US') {
+                quickUS.classList.remove('d-none');
+                costInput.placeholder = "20.00";
+                costInput.step = "0.01";
+                currencySymbol.innerText = "$";
             }
         }
 

@@ -173,3 +173,31 @@ h1, h2, h3, h4, h5, h6 {
 .bfl-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: var(--card-shadow); margin-bottom: 1rem; }
 .bfl-text-green { color: var(--primary-color); }
 .bfl-unit { font-size: 0.8em; margin-left: 2px; color: #64748b; }
+
+/* Monthly Summary Card Enhancements */
+.monthly-summary-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.monthly-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.monthly-summary-card .metric-item {
+    min-width: 80px;
+}
+
+@media (max-width: 767.98px) {
+    .monthly-summary-card .d-flex {
+        flex-wrap: wrap;
+    }
+    
+    .monthly-summary-card .badge {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
