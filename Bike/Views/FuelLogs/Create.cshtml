@@ -1,81 +1,241 @@
+
 @model Bike.Models.FuelLog
 
 @{
-    ViewData["Title"] = "Add Log";
+    Layout = "_AppLayout";
+    ViewData["Title"] = "Add";
 
     var lang = Context.Session.GetString("lang") ?? "en";
     string currencyLabel = Context.Session.GetString("currency") ?? "USD";
-    var fuelDate = (Model?.FuelDate ?? DateTime.Today).ToString("yyyy-MM-dd");
 
-    // Translations for this view
+    var fuelDate =
+        (Model?.FuelDate ?? DateTime.Today)
+        .ToString("yyyy-MM-dd");
+
+    // Translations
     var t = new Dictionary<string, Dictionary<string, string>>
     {
-        ["en"] = new() { ["AddTitle"] = "Add Fuel Log", ["Date"] = "Date", ["Cost"] = "Cost", ["Save"] = "Save", ["Region"] = "Region", ["Vietnam"] = "Vietnam", ["Japan"] = "Japan", ["USA"] = "USA" },
-        ["ja"] = new() { ["AddTitle"] = "給油記録の追加", ["Date"] = "日付", ["Cost"] = "金額", ["Save"] = "保存", ["Region"] = "地域", ["Vietnam"] = "ベトナム", ["Japan"] = "日本", ["USA"] = "アメリカ" },
-        ["vi"] = new() { ["AddTitle"] = "Thêm Nhật ký Nhiên liệu", ["Date"] = "Ngày", ["Cost"] = "Chi phí", ["Save"] = "Lưu", ["Region"] = "Vùng", ["Vietnam"] = "Việt Nam", ["Japan"] = "Nhật Bản", ["USA"] = "Mỹ" }
+        ["en"] = new()
+        {
+            ["Dashboard"] = "Dashboard",
+            ["Add"] = "Add",
+            ["History"] = "History",
+            ["Monthly"] = "Monthly",
+            ["AddTitle"] = "Add Fuel Log",
+            ["Date"] = "Date",
+            ["Cost"] = "Cost",
+            ["Save"] = "Save",
+            ["Region"] = "Region",
+            ["Vietnam"] = "Vietnam",
+            ["Japan"] = "Japan",
+            ["FullTank"] = "Full Tank"
+        },
+
+        ["ja"] = new()
+        {
+            ["Dashboard"] = "ダッシュボード",
+            ["Add"] = "追加",
+            ["History"] = "履歴",
+            ["Monthly"] = "月間集計",
+            ["AddTitle"] = "給油記録の追加",
+            ["Date"] = "日付",
+            ["Cost"] = "金額",
+            ["Save"] = "保存",
+            ["Region"] = "地域",
+            ["Vietnam"] = "ベトナム",
+            ["Japan"] = "日本",
+            ["FullTank"] = "満タン"
+        },
+
+        ["vi"] = new()
+        {
+            ["Dashboard"] = "Bảng điều khiển",
+            ["Add"] = "Thêm",
+            ["History"] = "Lịch sử",
+            ["Monthly"] = "Hàng tháng",
+            ["AddTitle"] = "Thêm Nhật ký Nhiên liệu",
+            ["Date"] = "Ngày",
+            ["Cost"] = "Chi phí",
+            ["Save"] = "Lưu",
+            ["Region"] = "Vùng",
+            ["Vietnam"] = "Việt Nam",
+            ["Japan"] = "Nhật Bản",
+            ["FullTank"] = "Đầy bình"
+        }
     };
 
-    var currentT = t.ContainsKey(lang) ? t[lang] : t["en"];
+    var currentT =
+        t.ContainsKey(lang)
+            ? t[lang]
+            : t["en"];
 }
 
 <div class="row justify-content-center">
-    <div class="col-12" style="max-width: 1000px; width: 90%;">
+    <div class="col-12"
+         style="max-width: 1000px; width: 90%;">
+
         <div class="card border-0 shadow-lg">
             <div class="card-body p-4 p-md-5">
+
                 <div class="d-flex align-items-center gap-3 mb-5">
                     <div class="stat-icon bg-success bg-opacity-10 text-success">
                         <i class="bi bi-plus-circle"></i>
                     </div>
-                    <h2 class="h4 mb-0 fw-bold">@currentT["AddTitle"]</h2>
+
+                    <h2 class="h4 mb-0 fw-bold">
+                        @currentT["AddTitle"]
+                    </h2>
                 </div>
 
-                <form asp-action="Create" method="post" id="fuelForm">
-                    <input type="hidden" name="Latitude" id="Latitude" />
-                    <input type="hidden" name="Longitude" id="Longitude" />
-                    <input type="hidden" name="Region" id="Region" value="VN" />
+                <form asp-action="Create"
+                      method="post"
+                      id="fuelForm">
+
+                    <input type="hidden"
+                           name="Latitude"
+                           id="Latitude" />
+
+                    <input type="hidden"
+                           name="Longitude"
+                           id="Longitude" />
+
+                    <input type="hidden"
+                           name="Region"
+                           id="Region"
+                           value="VN" />
 
                     <div class="row g-4 mb-4">
+
                         <div class="col-12 col-md-6">
-                            <label class="form-label">@currentT["Date"]</label>
-                            <input class="form-control form-control-lg" type="date" asp-for="FuelDate" value="@fuelDate" required />
+                            <label class="form-label">
+                                @currentT["Date"]
+                            </label>
+
+                            <input class="form-control form-control-lg"
+                                   type="date"
+                                   asp-for="FuelDate"
+                                   value="@fuelDate"
+                                   required />
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label class="form-label">@currentT["Region"]</label>
-                            <div class="btn-group w-100 shadow-sm rounded-3 overflow-hidden" style="height: 48px;">
-                                <input type="radio" class="btn-check" name="region_toggle" id="btnVN" autocomplete="off" checked onclick="setRegion('VN')">
-                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnVN">🇻🇳 @currentT["Vietnam"]</label>
 
-                                <input type="radio" class="btn-check" name="region_toggle" id="btnJP" autocomplete="off" onclick="setRegion('JP')">
-                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnJP">🇯🇵 @currentT["Japan"]</label>
+                            <label class="form-label">
+                                @currentT["Region"]
+                            </label>
 
-                                <input type="radio" class="btn-check" name="region_toggle" id="btnUS" autocomplete="off" onclick="setRegion('US')">
-                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold" for="btnUS">🇺🇸 @currentT["USA"]</label>
+                            <div class="btn-group w-100 shadow-sm rounded-3 overflow-hidden"
+                                 style="height: 48px;">
+
+                                <input type="radio"
+                                       class="btn-check"
+                                       name="region_toggle"
+                                       id="btnVN"
+                                       autocomplete="off"
+                                       checked
+                                       onclick="setRegion('VN')">
+
+                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold"
+                                       for="btnVN">
+                                    🇻🇳 @currentT["Vietnam"]
+                                </label>
+
+                                <input type="radio"
+                                       class="btn-check"
+                                       name="region_toggle"
+                                       id="btnJP"
+                                       autocomplete="off"
+                                       onclick="setRegion('JP')">
+
+                                <label class="btn btn-outline-success border-0 d-flex align-items-center justify-content-center fw-bold"
+                                       for="btnJP">
+                                    🇯🇵 @currentT["Japan"]
+                                </label>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label d-flex justify-content-end" id="costLabel">
-                            <span class="text-danger small fw-bold">* Required</span>
+
+                        <label class="form-label d-flex justify-content-between"
+                               id="costLabel">
+
+                            <span>
+                                @currentT["Cost"] (VND)
+                            </span>
+
+                            <span class="text-danger small fw-bold">
+                                * Required
+                            </span>
                         </label>
+
                         <div class="input-group input-group-lg shadow-sm">
-                            <span class="input-group-text bg-white border-end-0 text-muted" id="currencySymbol">₫</span>
-                            <input class="form-control border-start-0 ps-0" type="number" step="0.01" min="0" asp-for="Cost" id="CostInput" placeholder="50000" required />
-                        </div>
-                        
-                        <!-- Quick Buttons -->
-                        <div class="mt-3 d-flex flex-wrap gap-2" id="quickVN">
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(50000)">50,000 ₫</button>
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(100000)">100,000 ₫</button>
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(150000)">150,000 ₫</button>
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(200000)">200,000 ₫</button>
+
+                            <span class="input-group-text bg-white border-end-0 text-muted"
+                                  id="currencySymbol">
+                                ₫
+                            </span>
+
+                            <input class="form-control border-start-0 ps-0"
+                                   type="number"
+                                   step="1"
+                                   min="0"
+                                   asp-for="Cost"
+                                   id="CostInput"
+                                   placeholder="50000"
+                                   required />
                         </div>
 
-                        <div class="mt-3 d-flex flex-wrap gap-2 d-none" id="quickJP">
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(1000)">1,000 円</button>
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(3000)">3,000 円</button>
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(5000)">5,000 円</button>
+                        <!-- VN buttons -->
+                        <div class="mt-3 d-flex flex-wrap gap-2"
+                             id="quickVN">
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(50000)">
+                                50,000 ₫
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(100000)">
+                                100,000 ₫
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(150000)">
+                                150,000 ₫
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(200000)">
+                                200,000 ₫
+                            </button>
+                        </div>
+
+                        <!-- JP buttons -->
+                        <div class="mt-3 d-flex flex-wrap gap-2 d-none"
+                             id="quickJP">
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(1000)">
+                                1,000 円
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(3000)">
+                                3,000 円
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-light border btn-sm rounded-pill px-3 py-2"
+                                    onclick="setCost(5000)">
+                                5,000 円
+                            </button>
                         </div>
 
                         <div class="mt-3 d-flex flex-wrap gap-2 d-none" id="quickUS">
@@ -88,9 +248,13 @@
 
                     <div class="row justify-content-center">
                         <div class="col-12 col-md-6 col-lg-4">
+
                             <div class="d-grid">
-                                <button class="btn btn-success btn-lg py-3 shadow-lg fw-bold" type="submit">
-                                    <i class="bi bi-save me-2"></i> @currentT["Save"]
+                                <button class="btn btn-success btn-lg py-3 shadow-lg fw-bold"
+                                        type="submit">
+
+                                    <i class="bi bi-save me-2"></i>
+                                    @currentT["Save"]
                                 </button>
                             </div>
                         </div>
@@ -98,24 +262,39 @@
                 </form>
             </div>
         </div>
-        
+
         <div class="text-center mt-4">
-            <a href="/FuelLogs/Dashboard" class="text-muted text-decoration-none small fw-semibold">
-                <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+            <a href="/FuelLogs/Dashboard"
+               class="text-muted text-decoration-none small fw-semibold">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Back to Dashboard
             </a>
         </div>
     </div>
 </div>
 
 @section Scripts {
+
     <script>
         function setRegion(region) {
+
             document.getElementById('Region').value = region;
-            const quickVN = document.getElementById('quickVN');
-            const quickJP = document.getElementById('quickJP');
-            const quickUS = document.getElementById('quickUS');
-            const costInput = document.getElementById('CostInput');
-            const currencySymbol = document.getElementById('currencySymbol');
+
+            const quickVN =
+                document.getElementById('quickVN');
+
+            const quickJP =
+                document.getElementById('quickJP');
+
+            const costLabel =
+                document.getElementById('costLabel');
+
+            const costInput =
+                document.getElementById('CostInput');
+
+            const currencySymbol =
+                document.getElementById('currencySymbol');
 
             // Hide all quick buttons
             quickVN.classList.add('d-none');
@@ -123,14 +302,27 @@
             quickUS.classList.add('d-none');
 
             if (region === 'VN') {
+
                 quickVN.classList.remove('d-none');
+                quickJP.classList.add('d-none');
+
+                costLabel.querySelector('span:first-child')
+                    .innerText = '@currentT["Cost"] (VND)';
+
                 costInput.placeholder = "50000";
-                costInput.step = "1";
+
                 currencySymbol.innerText = "₫";
-            } else if (region === 'JP') {
+
+            } else {
+
                 quickJP.classList.remove('d-none');
+                quickVN.classList.add('d-none');
+
+                costLabel.querySelector('span:first-child')
+                    .innerText = '@currentT["Cost"] (JPY)';
+
                 costInput.placeholder = "3000";
-                costInput.step = "1";
+
                 currencySymbol.innerText = "¥";
             } else if (region === 'US') {
                 quickUS.classList.remove('d-none');
@@ -145,13 +337,22 @@
         }
 
         function getLocation() {
+
             if (navigator.geolocation) {
+
                 navigator.geolocation.getCurrentPosition(
+
                     pos => {
-                        document.getElementById('Latitude').value = pos.coords.latitude;
-                        document.getElementById('Longitude').value = pos.coords.longitude;
+                        document.getElementById('Latitude').value =
+                            pos.coords.latitude;
+
+                        document.getElementById('Longitude').value =
+                            pos.coords.longitude;
                     },
-                    err => console.warn("Location error:", err.message)
+
+                    err => console.warn(
+                        "Location error:",
+                        err.message)
                 );
             }
         }
