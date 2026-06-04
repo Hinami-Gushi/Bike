@@ -16,6 +16,7 @@
     @{
         var isAuthPage = ViewData["HideNav"]?.ToString() == "true";
         var userEmail = Context.Session.GetString("userEmail");
+        var lang = Context.Session.GetString("lang") ?? "en";
         var showSidebar = !isAuthPage && !string.IsNullOrEmpty(userEmail);
     }
     <div class="d-flex flex-column flex-md-row min-vh-100">
@@ -32,16 +33,16 @@
                 <div class="flex-grow-1 p-3">
                     <nav class="nav nav-pills flex-column gap-2">
                         <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "text-dark") px-3 py-2 rounded-3 d-flex align-items-center gap-3" asp-controller="FuelLogs" asp-action="Dashboard">
-                            <i class="bi bi-speedometer2 fs-5"></i> Dashboard
+                            <i class="bi bi-speedometer2 fs-5"></i> @TranslationHelper.T("Dashboard", lang)
                         </a>
                         <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "text-dark") px-3 py-2 rounded-3 d-flex align-items-center gap-3" asp-controller="FuelLogs" asp-action="Create">
-                            <i class="bi bi-plus-circle fs-5"></i> Add Log
+                            <i class="bi bi-plus-circle fs-5"></i> @TranslationHelper.T("AddLog", lang)
                         </a>
                         <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "text-dark") px-3 py-2 rounded-3 d-flex align-items-center gap-3" asp-controller="FuelLogs" asp-action="Index">
-                            <i class="bi bi-list-ul fs-5"></i> History
+                            <i class="bi bi-list-ul fs-5"></i> @TranslationHelper.T("History", lang)
                         </a>
                         <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Monthly" ? "active" : "text-dark") px-3 py-2 rounded-3 d-flex align-items-center gap-3" asp-controller="FuelLogs" asp-action="Monthly">
-                            <i class="bi bi-calendar3 fs-5"></i> Monthly
+                            <i class="bi bi-calendar3 fs-5"></i> @TranslationHelper.T("Monthly", lang)
                         </a>
                     </nav>
                 </div>
@@ -77,16 +78,16 @@
                         <div class="collapse navbar-collapse mt-3" id="navbarMobile">
                             <ul class="navbar-nav gap-2">
                                 <li class="nav-item">
-                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Dashboard">Dashboard</a>
+                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Dashboard">@TranslationHelper.T("Dashboard", lang)</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Create">Add Log</a>
+                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Create">@TranslationHelper.T("AddLog", lang)</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Index">History</a>
+                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Index">@TranslationHelper.T("History", lang)</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Monthly" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Monthly">Monthly</a>
+                                    <a class="nav-link rounded-3 px-3 py-2 @(ViewContext.RouteData.Values["Action"]?.ToString() == "Monthly" ? "bg-success bg-opacity-10 text-success fw-bold" : "")" href="/FuelLogs/Monthly">@TranslationHelper.T("Monthly", lang)</a>
                                 </li>
                                 <li class="border-top mt-2 pt-2">
                                     <a class="nav-link text-danger px-3" href="/Account/Logout">Logout</a>
@@ -108,19 +109,19 @@
                     <div class="container d-flex justify-content-around text-center">
                         <a href="/FuelLogs/Dashboard" class="text-decoration-none @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "text-success fw-bold" : "text-muted") small">
                             <i class="bi bi-speedometer2 d-block fs-4"></i>
-                            Dashboard
+                            @TranslationHelper.T("Dashboard", lang)
                         </a>
                         <a href="/FuelLogs/Create" class="text-decoration-none @(ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "text-success fw-bold" : "text-muted") small">
                             <i class="bi bi-plus-circle d-block fs-4"></i>
-                            Add
+                            @TranslationHelper.T("Add", lang)
                         </a>
                         <a href="/FuelLogs/Index" class="text-decoration-none @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "text-success fw-bold" : "text-muted") small">
                             <i class="bi bi-list-ul d-block fs-4"></i>
-                            History
+                            @TranslationHelper.T("History", lang)
                         </a>
                         <a href="/FuelLogs/Monthly" class="text-decoration-none @(ViewContext.RouteData.Values["Action"]?.ToString() == "Monthly" ? "text-success fw-bold" : "text-muted") small">
                             <i class="bi bi-calendar3 d-block fs-4"></i>
-                            Monthly
+                            @TranslationHelper.T("Monthly", lang)
                         </a>
                     </div>
                 </nav>

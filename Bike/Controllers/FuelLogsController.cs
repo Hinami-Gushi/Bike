@@ -216,13 +216,24 @@ namespace Bike.Controllers
                 DateTimeKind.Utc);
 
             var logs = _context.FuelLogs
+                .Where(x => x.UserId == userId &&
+                            x.FuelDate >= startDate &&
+                            x.Currency == selectedCurrency)
                 .Where(x =>
                     x.UserId == userId &&
                     x.FuelDate >= startDate &&
                     x.Currency == selectedCurrency)
                 .ToList();
 
+            string lang = HttpContext.Session.GetString("lang") ?? "en";
+
             var monthlySummaries = logs
+                .GroupBy(x => new { x.FuelDate.Year, x.FuelDate.Month })
+                .Select(g => new
+                {
+                    MonthYear = lang == "ja" 
+                        ? $"{g.Key.Year}年{g.Key.Month}月" 
+                        : $"{g.Key.Year}/{g.Key.Month:D2}",
                 .GroupBy(x => new
                 {
                     x.FuelDate.Year,
@@ -295,6 +306,21 @@ namespace Bike.Controllers
             double? Latitude,
             double? Longitude)
         {
+            var userId = HttpContext.Session.GetInt32("userId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+
+            if (log == null)
+            {
+                return BadRequest("Invalid data submitted.");
+            }
+
+
+            log.UserId = userId.Value;
+
+            // --- 自動計算ロジック (ベトナム・日本・アメリカ特化) ---
+            const double PRICE_VN = 23000.0; // 1L = 23,000 VND
+            const double PRICE_US = 0.95;    // 1L = 0.95 USD (approx)
             var userId =
                 HttpContext.Session.GetInt32("userId");
 
@@ -326,9 +352,33 @@ namespace Bike.Controllers
                         (log.Cost ?? 0) / priceJp;
                 }
             }
+            else if (Region == "US")
+            {
+                log.Currency = "USD";
+                log.FuelLiter = (log.Cost ?? 0) / PRICE_US;
+            }
+            else // Default to VN
             else
             {
                 log.Currency = "VND";
+
+            // --- 走行距離（Distance km）の自動計算の準備 ---
+            double currentLat = Latitude ?? 0;
+            double currentLng = Longitude ?? 0;
+
+            // TODO: ここでGoong MapsまたはGoogle Maps APIを呼び出し、距離を算出する
+            log.DistanceKm = 0; 
+
+
+
+
+            // UserId が 0 (初期値) の場合、暫定的に 1 をセットする（未ログイン等の場合）
+            if (log.UserId == 0)
+            {
+                log.UserId = 1;
+            }
+
+            // Convert to UTC as Npgsql 6.0+ requires UTC for 'timestamp with time zone'
 
                 log.FuelLiter =
                     (log.Cost ?? 0) / PRICE_VN;

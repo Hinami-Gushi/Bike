@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Globalization;
+using System;
 
 namespace Bike.Helpers
 {
@@ -10,6 +12,7 @@ namespace Bike.Helpers
             {
                 ["Dashboard"] = "Dashboard",
                 ["Add"] = "Add",
+                ["AddLog"] = "Add Log",
                 ["History"] = "History",
                 ["Monthly"] = "Monthly",
                 ["AvgEfficiency"] = "AVG EFFICIENCY",
@@ -35,8 +38,9 @@ namespace Bike.Helpers
                 {
                 ["Dashboard"] = "ダッシュボード",
                 ["Add"] = "追加",
+                ["AddLog"] = "給油記録追加",
                 ["History"] = "履歴",
-                ["Monthly"] = "月次",
+                ["Monthly"] = "月次集計",
                 ["AvgEfficiency"] = "平均燃費",
                 ["TotalFuel"] = "合計燃料",
                 ["ThisMonthCost"] = "今月の費用",
@@ -59,10 +63,11 @@ namespace Bike.Helpers
                 },
                 ["vi"] = new()
                 {
-                ["Dashboard"] = "Bảng điều khiển",
-                ["Add"] = "Thêm mới",
-                ["History"] = "Lịch sử",
-                ["Monthly"] = "Hàng tháng",
+                ["Dashboard"] = "Dashboard",
+                ["Add"] = "Add",
+                ["AddLog"] = "Add Log",
+                ["History"] = "History",
+                ["Monthly"] = "Monthly",
                 ["AvgEfficiency"] = "HIỆU SUẤT TB",
                 ["TotalFuel"] = "TỔNG NHIÊN LIỆU",
                 ["ThisMonthCost"] = "CHI PHÍ THÁNG NÀY",
@@ -96,6 +101,15 @@ namespace Bike.Helpers
             }
             
             return Translations["en"].TryGetValue(key, out var enTranslation) ? enTranslation : key;
+        }
+
+        public static string GetWeekday(DateTime date, string lang)
+        {
+            lang = lang?.ToLower() ?? "en";
+            // ja -> ja-JP
+            // en, vi -> en-US
+            var culture = (lang == "ja") ? new CultureInfo("ja-JP") : new CultureInfo("en-US");
+            return date.ToString("dddd", culture);
         }
     }
 }

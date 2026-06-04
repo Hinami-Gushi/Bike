@@ -237,6 +237,13 @@
                                 5,000 円
                             </button>
                         </div>
+
+                        <div class="mt-3 d-flex flex-wrap gap-2 d-none" id="quickUS">
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(10)">$ 10.00</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(20)">$ 20.00</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(30)">$ 30.00</button>
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-3 py-2" onclick="setCost(40)">$ 40.00</button>
+                        </div>
                     </div>
 
                     <div class="row justify-content-center">
@@ -289,6 +296,11 @@
             const currencySymbol =
                 document.getElementById('currencySymbol');
 
+            // Hide all quick buttons
+            quickVN.classList.add('d-none');
+            quickJP.classList.add('d-none');
+            quickUS.classList.add('d-none');
+
             if (region === 'VN') {
 
                 quickVN.classList.remove('d-none');
@@ -312,6 +324,11 @@
                 costInput.placeholder = "3000";
 
                 currencySymbol.innerText = "¥";
+            } else if (region === 'US') {
+                quickUS.classList.remove('d-none');
+                costInput.placeholder = "20.00";
+                costInput.step = "0.01";
+                currencySymbol.innerText = "$";
             }
         }
 
